@@ -1,50 +1,68 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- 
+Sync Impact Report:
+- Version change: 1.1.0 → 1.2.0 (添加参数优化和Walk Forward Analysis要求)
+- List of modified principles: 严格的TDD与回测验证原则 - 明确增加Walk Forward Analysis要求
+- Added sections: None
+- Removed sections: None
+- Templates requiring updates: ✅ 已检查所有模板（plan-template.md, spec-template.md, tasks-template.md）
+- Follow-up TODOs: None
+-->
+# QoraTrader可转债交易策略平台宪法
 
-## Core Principles
+## 核心原则
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. 清晰简洁与策略插件化原则
+代码编写必须尽可能清晰、简洁且易于维护。所有交易策略必须作为独立插件实现，并遵循统一的策略接口规范。策略代码必须可独立开发、测试和部署，与核心交易引擎解耦。避免过早优化和不必要的复杂性。坚守"你不会需要它"（YAGNI）原则。所有代码都应能让新加入项目的开发者轻松理解。每个策略需提供完整的配置文件、参数优化空间定义和风险控制参数。
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. 严格的TDD与回测验证原则
+**所有代码都必须严格遵循测试驱动开发模式。** 任何新功能或错误修复都严禁在没有对应失败测试的情况下进行开发。开发工作流必须强制执行"红-绿-重构"循环：1) 为每一个微小的功能变更或修复，首先编写一个明确失败的自动化测试；2) 编写最精简的代码，仅为了让该测试通过；3) 在测试持续通过的保障下，优化代码结构，消除重复，提高可读性。此原则不可协商。任何策略在实盘部署前必须通过历史数据回测验证，回测需包含完整的交易成本模型、滑点模拟和风险评估。策略参数优化需采用Walk Forward分析方法，避免过拟合。
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. 工具一致性与API优先设计原则
+项目将使用一套标准化的工具进行开发、构建、测试和部署。这确保了一致性，减少了配置偏差，并为所有团队成员简化了开发环境的搭建。任何新工具都必须经过批准并在项目的文档中记录。所有服务和组件都应采用 API 优先的方法进行设计。在开始实施之前，定义并记录 API 契约。这确保了组件的接口定义良好，并能满足其消费者的需求，特别是在策略接口、行情接口、交易接口等关键组件中。
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. 语义化版本控制与策略管理原则
+项目严格遵守语义化版本控制 2.0.0。所有发布版本都必须采用 `主版本号.次版本号.修订号` 的格式。对于策略插件，同样采用语义化版本控制，主版本号对应重大策略调整，次版本号对应策略逻辑优化，修订号对应bug修复。策略配置文件必须明确指定策略版本，确保回测和实盘运行的一致性。
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. 统一用户体验与系统性能原则
+所有面向用户的组件必须遵守通用的设计体系和交互模式。跨应用的界面元素、术语和工作流程必须保持一致，以确保为用户提供可预测且直观的体验。系统必须以响应迅速和高效为设计目标。必须评估新功能的性能影响。关键用户交互和API端点必须满足已定义的性能基准（例如，行情接收延迟<10ms，策略信号生成<100ms，订单执行<50ms）。系统必须支持毫秒级行情接收和订单执行，Tick到订单的平均延迟低于100ms。
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## 安全与运维标准
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### 配置与认证安全
+敏感信息（如交易账户密码、API密钥）必须通过环境变量或专用密钥管理工具注入，严禁硬编码或明文存储。所有API端点必须通过JWT等机制进行认证和授权。数据库连接必须使用加密协议。
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### 系统监控与可靠性
+系统需提供完整的结构化日志记录功能，便于故障排查和性能分析。需实现断线重连与状态恢复机制，确保网络异常后能自动恢复。系统需具备容器化部署能力，支持Docker和Docker Compose进行一键部署。系统需具备实时性能监控和告警机制，确保交易时段核心服务可用性>99.9%。
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## 工具一致性标准
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+项目必须使用标准化的开发工具链，包括但不限于：
+- 版本控制：Git，遵循Git Flow工作流
+- 代码格式化：根据语言选择相应的格式化工具（如black、isort用于Python）
+- 静态分析：使用linter工具进行代码质量检查
+- 持续集成：通过CI/CD管道自动执行测试和部署
+- 文档：使用Markdown格式，保持文档与代码同步
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+## 统一用户体验标准
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+所有面向用户的界面和API必须遵循统一的设计原则：
+- API端点命名和数据结构保持一致性
+- 错误消息格式标准化
+- 配置参数命名和结构统一
+- 日志格式标准化，便于系统监控和调试
+
+## 开发工作流与质量门禁
+
+所有工作都应在从 `main` 分支创建的特性分支上进行。禁止直接向 `main` 分支提交代码。每个特性、错误修复或变更都必须创建一个拉取请求 (PR)。每个 PR 在合并前必须由至少一名其他开发者审查和批准。
+
+在 PR 可以合并之前，必须通过以下质量门禁：
+- 所有现有和新增的测试都必须通过。
+- 代码必须遵守项目的代码规范和风格规则。
+- PR 必须经过同行评审并获得批准。
+- 如果变更修改了行为或增加了新功能，必须有相应的文档记录。
+
+## 治理
+
+本宪法是项目开发实践的指导文件。任何对本宪法的拟议修改都必须以拉取请求的形式提交，经团队审查和批准后方可合并。所有开发活动都必须与此处概述的原则保持一致。本宪法为QoraTrader项目的最高治理文件，所有开发实践、技术决策和代码实现必须符合本宪法原则。任何对宪法的修改需经过项目核心团队评审并记录变更理由。所有代码审查和质量检查必须验证对宪法原则的符合性。
+
+**Version**: 1.2.0 | **Ratified**: 2025-10-21 | **Last Amended**: 2025-10-23

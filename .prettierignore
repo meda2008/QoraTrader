@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Distribution / packaging
+dist/
+build/
+
+# Testing
+coverage/
+
+# Logs
+*.log
+
+# Environment
+.env*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Other
+*.log
+package-lock.json
+yarn.lock

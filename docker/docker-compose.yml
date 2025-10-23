@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://qoratrader:qoratrader@db:5432/qoratrader
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=influxdb_token
+      - INFLUXDB_ORG=org
+      - INFLUXDB_BUCKET=bucket
+    depends_on:
+      - db
+      - influxdb
+    volumes:
+      - ./backend:/app  # For development
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload  # For development
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./db/init:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_DB=qoratrader
+      - POSTGRES_USER=qoratrader
+      - POSTGRES_PASSWORD=qoratrader
+    ports:
+      - "5432:5432"
+
+  influxdb:
+    image: influxdb:2.7
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=influxdb_password
+      - DOCKER_INFLUXDB_INIT_ORG=org
+      - DOCKER_INFLUXDB_INIT_BUCKET=bucket
+    ports:
+      - "8086:8086"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
+  influxdb_data:
