@@ -303,14 +303,14 @@
 
 ### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T099 [P] [US3] Contract test for strategy hot loading endpoint in backend/tests/contract/test_strategy_hot_load.py
-- [ ] T100 [P] [US3] Integration test for hot loading functionality in backend/tests/integration/test_strategy_hot_load.py
+- [x] T099 [P] [US3] Contract test for strategy hot loading endpoint in backend/tests/contract/test_strategy_hot_load.py
+- [x] T100 [P] [US3] Integration test for hot loading functionality in backend/tests/integration/test_strategy_hot_load.py
 
 ### Implementation for User Story 3
 
-- [ ] T101 [US3] Implement strategy hot loading mechanism in backend/src/strategies/hot_loader.py
-- [ ] T102 [US3] Create hot loading endpoint in backend/src/api/v1/strategies.py
-- [ ] T103 [US3] Add strategy lifecycle management for hot loading in backend/src/strategies/lifecycle.py
+- [x] T101 [US3] Implement strategy hot loading mechanism in backend/src/strategies/hot_loader.py
+- [x] T102 [US3] Create hot loading endpoint in backend/src/api/v1/strategies.py
+- [x] T103 [US3] Add strategy lifecycle management for hot loading in backend/src/strategies/lifecycle.py
 
 **Checkpoint**: At this point, User Story 3 should work independently
 
@@ -324,14 +324,14 @@
 
 ### Tests for User Story 8 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T104 [P] [US8] Contract test for custom indicator registration endpoint in backend/tests/contract/test_custom_indicators.py
-- [ ] T105 [P] [US8] Integration test for custom indicator functionality in backend/tests/integration/test_custom_indicators.py
+- [x] T104 [P] [US8] Contract test for custom indicator registration endpoint in backend/tests/contract/test_custom_indicators.py
+- [x] T105 [P] [US8] Integration test for custom indicator functionality in backend/tests/integration/test_custom_indicators.py
 
 ### Implementation for User Story 8
 
-- [ ] T106 [US8] Create custom indicator registration mechanism in backend/src/indicators/custom_loader.py
-- [ ] T107 [US8] Add custom indicator registration endpoint in backend/src/api/v1/indicators.py
-- [ ] T108 [US8] Update indicator service to support custom libraries in backend/src/services/indicator_service.py
+- [x] T106 [US8] Create custom indicator registration mechanism in backend/src/indicators/custom_loader.py
+- [x] T107 [US8] Add custom indicator registration endpoint in backend/src/api/v1/indicators.py
+- [x] T108 [US8] Update indicator service to support custom libraries in backend/src/services/indicator_service.py
 
 **Checkpoint**: At this point, User Story 8 should work independently
 
