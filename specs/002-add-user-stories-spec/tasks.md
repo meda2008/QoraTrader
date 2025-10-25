@@ -190,16 +190,16 @@
 
 ### Tests for User Story 9 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T066 [P] [US9] Contract test for strategy dashboard endpoint in backend/tests/contract/test_strategy_dashboard.py
-- [ ] T067 [P] [US9] Integration test for dashboard data retrieval in backend/tests/integration/test_dashboard.py
+- [x] T066 [P] [US9] Contract test for strategy dashboard endpoint in backend/tests/contract/test_strategy_dashboard.py
+- [x] T067 [P] [US9] Integration test for dashboard data retrieval in backend/tests/integration/test_dashboard.py
 
 ### Implementation for User Story 9
 
-- [ ] T068 [P] [US9] Implement strategy monitoring service in backend/src/services/strategy_monitor.py
-- [ ] T069 [US9] Create strategy dashboard endpoint in backend/src/api/v1/strategy_dashboard.py
-- [ ] T070 [US9] Create dashboard UI page in frontend/src/pages/StrategyDashboard.tsx
-- [ ] T071 [US9] Create dashboard components in frontend/src/components/StrategyDashboard/
-- [ ] T072 [US9] Implement WebSocket connection for real-time updates in frontend/src/services/websocket.ts
+- [x] T068 [P] [US9] Implement strategy monitoring service in backend/src/services/strategy_monitor.py
+- [x] T069 [US9] Create strategy dashboard endpoint in backend/src/api/v1/strategy_dashboard.py
+- [x] T070 [US9] Create dashboard UI page in frontend/src/pages/StrategyDashboard.tsx
+- [x] T071 [US9] Create dashboard components in frontend/src/components/StrategyDashboard/
+- [x] T072 [US9] Implement WebSocket connection for real-time updates in frontend/src/services/websocket.ts
 
 **Checkpoint**: At this point, User Story 9 should work independently
 
@@ -213,16 +213,16 @@
 
 ### Tests for User Story 10 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T073 [P] [US10] Contract test for strategy details endpoint in backend/tests/contract/test_strategy_details.py
-- [ ] T074 [P] [US10] Integration test for detailed report retrieval in backend/tests/integration/test_strategy_details.py
+- [x] T073 [P] [US10] Contract test for strategy details endpoint in backend/tests/contract/test_strategy_details.py
+- [x] T074 [P] [US10] Integration test for detailed report retrieval in backend/tests/integration/test_strategy_details.py
 
 ### Implementation for User Story 10
 
-- [ ] T075 [US10] Create strategy details endpoint in backend/src/api/v1/strategy_details.py
-- [ ] T076 [US10] Create detailed strategy report components in backend/src/services/strategy_report_service.py
-- [ ] T077 [US10] Create strategy details UI page in frontend/src/pages/StrategyDetails.tsx
-- [ ] T078 [US10] Create chart components for performance visualization in frontend/src/components/charts/
-- [ ] T079 [US10] Implement data visualization using charting library in frontend/src/components/charts/PerformanceChart.tsx
+- [x] T075 [US10] Create strategy details endpoint in backend/src/api/v1/strategy_details.py
+- [x] T076 [US10] Create detailed strategy report components in backend/src/services/strategy_report_service.py
+- [x] T077 [US10] Create strategy details UI page in frontend/src/pages/StrategyDetails.tsx
+- [x] T078 [US10] Create chart components for performance visualization in frontend/src/components/charts/
+- [x] T079 [US10] Implement data visualization using charting library in frontend/src/components/charts/PerformanceChart.tsx
 
 **Checkpoint**: At this point, User Story 10 should work independently
 
