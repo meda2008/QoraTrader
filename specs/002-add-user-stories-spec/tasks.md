@@ -236,15 +236,15 @@
 
 ### Tests for User Story 12 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T080 [P] [US12] Contract test for signal visualization endpoint in backend/tests/contract/test_signal_visualization.py
-- [ ] T081 [P] [US12] Integration test for signal and trade visualization in backend/tests/integration/test_signal_visualization.py
+- [x] T080 [P] [US12] Contract test for signal visualization endpoint in backend/tests/contract/test_signal_visualization.py
+- [x] T081 [P] [US12] Integration test for signal and trade visualization in backend/tests/integration/test_signal_visualization.py
 
 ### Implementation for User Story 12
 
-- [ ] T082 [US12] Create signal-trading visualization endpoint in backend/src/api/v1/visualization.py
-- [ ] T083 [US12] Implement signal visualization service in backend/src/services/visualization_service.py
-- [ ] T084 [US12] Create signal visualization UI component in frontend/src/components/SignalVisualization.tsx
-- [ ] T085 [US12] Enhance charting components to show signals and trades in frontend/src/components/charts/
+- [x] T082 [US12] Create signal-trading visualization endpoint in backend/src/api/v1/visualization.py
+- [x] T083 [US12] Implement signal visualization service in backend/src/services/visualization_service.py
+- [x] T084 [US12] Create signal visualization UI component in frontend/src/components/SignalVisualization.tsx
+- [x] T085 [US12] Enhance charting components to show signals and trades in frontend/src/components/charts/
 
 **Checkpoint**: At this point, User Story 12 should work independently
 
@@ -258,15 +258,15 @@
 
 ### Tests for User Story 13 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T086 [P] [US13] Contract test for risk monitoring endpoint in backend/tests/contract/test_risk_monitoring.py
-- [ ] T087 [P] [US13] Integration test for risk monitoring functionality in backend/tests/integration/test_risk_monitoring.py
+- [x] T086 [P] [US13] Contract test for risk monitoring endpoint in backend/tests/contract/test_risk_monitoring.py
+- [x] T087 [P] [US13] Integration test for risk monitoring functionality in backend/tests/integration/test_risk_monitoring.py
 
 ### Implementation for User Story 13
 
-- [ ] T088 [P] [US13] Create risk metrics calculation service in backend/src/services/risk_metrics_service.py
-- [ ] T089 [US13] Create risk monitoring endpoint in backend/src/api/v1/risk_monitoring.py
-- [ ] T090 [US13] Create risk dashboard UI page in frontend/src/pages/RiskDashboard.tsx
-- [ ] T091 [US13] Create risk visualization components in frontend/src/components/RiskVisualization/
+- [x] T088 [P] [US13] Create risk metrics calculation service in backend/src/services/risk_metrics_service.py
+- [x] T089 [US13] Create risk monitoring endpoint in backend/src/api/v1/risk_monitoring.py
+- [x] T090 [US13] Create risk dashboard UI page in frontend/src/pages/RiskDashboard.tsx
+- [x] T091 [US13] Create risk visualization components in frontend/src/components/RiskVisualization/
 
 **Checkpoint**: At this point, User Story 13 should work independently
 
