@@ -145,14 +145,14 @@
 
 ### Tests for User Story 6 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T053 [P] [US6] Integration test for local environment setup in tests/integration/test_development_env.py
+- [x] T053 [P] [US6] Integration test for local environment setup in tests/integration/test_development_env.py
 
 ### Implementation for User Story 6
 
-- [ ] T054 [US6] Create local development docker-compose in docker/docker-compose.dev.yml
-- [ ] T055 [US6] Create development environment script in scripts/dev-setup.sh
-- [ ] T056 [US6] Update documentation for local development in docs/local-development.md
-- [ ] T057 [US6] Implement hot-reload functionality for strategy updates in backend/src/strategies/hot_reload.py
+- [x] T054 [US6] Create local development docker-compose in docker/docker-compose.dev.yml
+- [x] T055 [US6] Create development environment script in scripts/dev-setup.sh
+- [x] T056 [US6] Update documentation for local development in docs/local-development.md
+- [x] T057 [US6] Implement hot-reload functionality for strategy updates in backend/src/strategies/hot_reload.py
 
 **Checkpoint**: At this point, all priority 1 stories should work independently
 
@@ -166,17 +166,17 @@
 
 ### Tests for User Story 7 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T058 [P] [US7] Contract test for indicator calculation endpoint in backend/tests/contract/test_indicators.py
-- [ ] T059 [P] [US7] Integration test for indicator service in backend/tests/integration/test_indicators.py
+- [x] T058 [P] [US7] Contract test for indicator calculation endpoint in backend/tests/contract/test_indicators.py
+- [x] T059 [P] [US7] Integration test for indicator service in backend/tests/integration/test_indicators.py
 
 ### Implementation for User Story 7
 
-- [ ] T060 [P] [US7] Create IndicatorLibrary model in backend/src/models/indicator_library.py
-- [ ] T061 [US7] Implement IndicatorService in backend/src/services/indicator_service.py
-- [ ] T062 [US7] Create standard indicator interface in backend/src/indicators/base.py
-- [ ] T063 [US7] Integrate TA-Lib as default indicator library in backend/src/indicators/ta_lib_adapter.py
-- [ ] T064 [US7] Add indicator calculation endpoint in backend/src/api/v1/indicators.py
-- [ ] T065 [US7] Update strategy interface to include indicator service access
+- [x] T060 [P] [US7] Create IndicatorLibrary model in backend/src/models/indicator_library.py
+- [x] T061 [US7] Implement IndicatorService in backend/src/services/indicator_service.py
+- [x] T062 [US7] Create standard indicator interface in backend/src/indicators/base.py
+- [x] T063 [US7] Integrate TA-Lib as default indicator library in backend/src/indicators/ta_lib_adapter.py
+- [x] T064 [US7] Add indicator calculation endpoint in backend/src/api/v1/indicators.py
+- [x] T065 [US7] Update strategy interface to include indicator service access
 
 **Checkpoint**: At this point, User Story 7 should work independently
 
