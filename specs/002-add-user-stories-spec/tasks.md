@@ -428,14 +428,14 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T132 [P] Documentation updates in docs/
-- [ ] T133 Code cleanup and refactoring
-- [ ] T134 Performance optimization across all stories
-- [ ] T135 [P] Additional unit tests (if requested) in backend/tests/unit/
-- [ ] T136 Security hardening
-- [ ] T137 Run quickstart.md validation
-- [ ] T138 System integration testing
-- [ ] T139 Performance testing for core trading path <1ms P99 latency
+- [x] T132 [P] Documentation updates in docs/
+- [x] T133 Code cleanup and refactoring
+- [x] T134 Performance optimization across all stories
+- [x] T135 [P] Additional unit tests (if requested) in backend/tests/unit/
+- [x] T136 Security hardening
+- [x] T137 Run quickstart.md validation
+- [x] T138 System integration testing
+- [x] T139 Performance testing for core trading path <1ms P99 latency
 
 ---
 
