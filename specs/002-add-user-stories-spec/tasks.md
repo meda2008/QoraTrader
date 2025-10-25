@@ -280,16 +280,16 @@
 
 ### Tests for User Story 14 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T092 [P] [US14] Contract test for risk rule configuration endpoint in backend/tests/contract/test_risk_rules.py
-- [ ] T093 [P] [US14] Integration test for risk rule application in backend/tests/integration/test_risk_rules.py
+- [x] T092 [P] [US14] Contract test for risk rule configuration endpoint in backend/tests/contract/test_risk_rules.py
+- [x] T093 [P] [US14] Integration test for risk rule application in backend/tests/integration/test_risk_rules.py
 
 ### Implementation for User Story 14
 
-- [ ] T094 [P] [US14] Create RiskParams model in backend/src/models/risk_params.py
-- [ ] T095 [US14] Implement risk rule management service in backend/src/services/risk_rule_service.py
-- [ ] T096 [US14] Create risk rule configuration endpoint in backend/src/api/v1/risk_rules.py
-- [ ] T097 [US14] Create risk configuration UI page in frontend/src/pages/RiskConfig.tsx
-- [ ] T098 [US14] Implement risk rule validation and enforcement in backend/src/risk/
+- [x] T094 [P] [US14] Create RiskParams model in backend/src/models/risk_params.py
+- [x] T095 [US14] Implement risk rule management service in backend/src/services/risk_rule_service.py
+- [x] T096 [US14] Create risk rule configuration endpoint in backend/src/api/v1/risk_rules.py
+- [x] T097 [US14] Create risk configuration UI page in frontend/src/pages/RiskConfig.tsx
+- [x] T098 [US14] Implement risk rule validation and enforcement in backend/src/risk/
 
 **Checkpoint**: At this point, User Story 14 should work independently
 
