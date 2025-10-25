@@ -345,14 +345,14 @@
 
 ### Tests for User Story 11 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T109 [P] [US11] Contract test for parameter update endpoint in backend/tests/contract/test_strategy_params.py
-- [ ] T110 [P] [US11] Integration test for parameter adjustment workflow in backend/tests/integration/test_strategy_params.py
+- [x] T109 [P] [US11] Contract test for parameter update endpoint in backend/tests/contract/test_strategy_params.py
+- [x] T110 [P] [US11] Integration test for parameter adjustment workflow in backend/tests/integration/test_strategy_params.py
 
 ### Implementation for User Story 11
 
-- [ ] T111 [US11] Create parameter update endpoint in backend/src/api/v1/strategies.py
-- [ ] T112 [US11] Implement parameter adjustment service in backend/src/services/strategy_param_service.py
-- [ ] T113 [US11] Add parameter adjustment UI to strategy detail page in frontend/src/components/StrategyParams.tsx
+- [x] T111 [US11] Create parameter update endpoint in backend/src/api/v1/strategies.py
+- [x] T112 [US11] Implement parameter adjustment service in backend/src/services/strategy_param_service.py
+- [x] T113 [US11] Add parameter adjustment UI to strategy detail page in frontend/src/components/StrategyParams.tsx
 
 **Checkpoint**: At this point, User Story 11 should work independently
 
@@ -366,14 +366,14 @@
 
 ### Tests for User Story 4 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T114 [P] [US4] Contract test for exchange adapter endpoint in backend/tests/contract/test_exchange_adapter.py
-- [ ] T115 [P] [US4] Integration test for new exchange adapter functionality in backend/tests/integration/test_exchange_adapter.py
+- [x] T114 [P] [US4] Contract test for exchange adapter endpoint in backend/tests/contract/test_exchange_adapter.py
+- [x] T115 [P] [US4] Integration test for new exchange adapter functionality in backend/tests/integration/test_exchange_adapter.py
 
 ### Implementation for User Story 4
 
-- [ ] T116 [US4] Create exchange adapter interface in backend/src/exchanges/base_adapter.py
-- [ ] T117 [US4] Implement exchange registration mechanism in backend/src/exchanges/registry.py
-- [ ] T118 [US4] Add exchange adapter management API in backend/src/api/v1/exchanges.py
+- [x] T116 [US4] Create exchange adapter interface in backend/src/exchanges/base_adapter.py
+- [x] T117 [US4] Implement exchange registration mechanism in backend/src/exchanges/registry.py
+- [x] T118 [US4] Add exchange adapter management API in backend/src/api/v1/exchanges.py
 
 **Checkpoint**: At this point, User Story 4 should work independently
 
