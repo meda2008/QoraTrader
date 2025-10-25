@@ -21,12 +21,12 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan in QoraTrader/
-- [ ] T002 Initialize Python project with FastAPI dependencies in backend/
-- [ ] T003 [P] Initialize TypeScript/React project with dependencies in frontend/
-- [ ] T004 [P] Configure linting and formatting tools in both backend and frontend
-- [ ] T005 Create Docker and Docker Compose configuration files in docker/
-- [ ] T006 Initialize database schemas and migrations framework in db/
+- [x] T001 Create project structure per implementation plan in QoraTrader/
+- [x] T002 Initialize Python project with FastAPI dependencies in backend/
+- [x] T003 [P] Initialize TypeScript/React project with dependencies in frontend/
+- [x] T004 [P] Configure linting and formatting tools in both backend and frontend
+- [x] T005 Create Docker and Docker Compose configuration files in docker/
+- [x] T006 Initialize database schemas and migrations framework in db/
 
 ---
 
@@ -36,16 +36,16 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Setup database schema and migrations framework using PostgreSQL and TimescaleDB
-- [ ] T008 [P] Implement authentication/authorization framework in backend/src/auth/
-- [ ] T009 [P] Setup API routing and middleware structure in backend/src/api/
-- [ ] T010 Create base models/entities that all stories depend on in backend/src/models/
-- [ ] T011 Configure error handling and logging infrastructure in backend/src/utils/
-- [ ] T012 Setup environment configuration management in backend/src/config/
-- [ ] T013 Implement core trading engine infrastructure in backend/src/trading/
-- [ ] T014 Create base strategy interface in backend/src/strategies/
-- [ ] T015 [P] Implement event bus/messaging system in backend/src/events/
-- [ ] T016 Setup indicator service interface in backend/src/indicators/
+- [x] T007 Setup database schema and migrations framework using PostgreSQL and TimescaleDB
+- [x] T008 [P] Implement authentication/authorization framework in backend/src/auth/
+- [x] T009 [P] Setup API routing and middleware structure in backend/src/api/
+- [x] T010 Create base models/entities that all stories depend on in backend/src/models/
+- [x] T011 Configure error handling and logging infrastructure in backend/src/utils/
+- [x] T012 Setup environment configuration management in backend/src/config/
+- [x] T013 Implement core trading engine infrastructure in backend/src/trading/
+- [x] T014 Create base strategy interface in backend/src/strategies/
+- [x] T015 [P] Implement event bus/messaging system in backend/src/events/
+- [x] T016 Setup indicator service interface in backend/src/indicators/
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -61,21 +61,21 @@
 
 **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T017 [P] [US1] Contract test for backtest creation endpoint in backend/tests/contract/test_backtest.py
-- [ ] T018 [P] [US1] Contract test for backtest report retrieval endpoint in backend/tests/contract/test_backtest.py
-- [ ] T019 [P] [US1] Integration test for complete backtest workflow in backend/tests/integration/test_backtest_workflow.py
+- [x] T017 [P] [US1] Contract test for backtest creation endpoint in backend/tests/contract/test_backtest.py
+- [x] T018 [P] [US1] Contract test for backtest report retrieval endpoint in backend/tests/contract/test_backtest.py
+- [x] T019 [P] [US1] Integration test for complete backtest workflow in backend/tests/integration/test_backtest_workflow.py
 
 ### Implementation for User Story 1
 
-- [ ] T020 [P] [US1] Create BacktestReport model in backend/src/models/backtest_report.py
-- [ ] T021 [P] [US1] Create MarketData model in backend/src/models/market_data.py
-- [ ] T022 [US1] Implement BacktestService in backend/src/services/backtest_service.py
-- [ ] T023 [US1] Implement MarketDataService in backend/src/services/market_data_service.py
-- [ ] T024 [US1] Implement backtest creation endpoint in backend/src/api/v1/backtest.py
-- [ ] T025 [US1] Implement backtest report retrieval endpoint in backend/src/api/v1/backtest.py
-- [ ] T026 [US1] Create backtest engine in backend/src/backtest/engine.py
-- [ ] T027 [US1] Add validation and error handling for backtest requests
-- [ ] T028 [US1] Add logging for backtest operations
+- [x] T020 [P] [US1] Create BacktestReport model in backend/src/models/backtest_report.py
+- [x] T021 [P] [US1] Create MarketData model in backend/src/models/market_data.py
+- [x] T022 [US1] Implement BacktestService in backend/src/services/backtest_service.py
+- [x] T023 [US1] Implement MarketDataService in backend/src/services/market_data_service.py
+- [x] T024 [US1] Implement backtest creation endpoint in backend/src/api/v1/backtest.py
+- [x] T025 [US1] Implement backtest report retrieval endpoint in backend/src/api/v1/backtest.py
+- [x] T026 [US1] Create backtest engine in backend/src/backtest/engine.py
+- [x] T027 [US1] Add validation and error handling for backtest requests
+- [x] T028 [US1] Add logging for backtest operations
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
