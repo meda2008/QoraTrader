@@ -387,15 +387,15 @@
 
 ### Tests for User Story 15 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T119 [P] [US15] Contract test for report generation endpoint in backend/tests/contract/test_reports.py
-- [ ] T120 [P] [US15] Integration test for report generation functionality in backend/tests/integration/test_reports.py
+- [x] T119 [P] [US15] Contract test for report generation endpoint in backend/tests/contract/test_reports.py
+- [x] T120 [P] [US15] Integration test for report generation functionality in backend/tests/integration/test_reports.py
 
 ### Implementation for User Story 15
 
-- [ ] T121 [P] [US15] Create report generation service in backend/src/services/report_service.py
-- [ ] T122 [US15] Create report generation endpoint in backend/src/api/v1/reports.py
-- [ ] T123 [US15] Create report UI page in frontend/src/pages/Reports.tsx
-- [ ] T124 [US15] Create export functionality for reports in frontend/src/services/report_export.ts
+- [x] T121 [P] [US15] Create report generation service in backend/src/services/report_service.py
+- [x] T122 [US15] Create report generation endpoint in backend/src/api/v1/reports.py
+- [x] T123 [US15] Create report UI page in frontend/src/pages/Reports.tsx
+- [x] T124 [US15] Create export functionality for reports in frontend/src/services/report_export.ts
 
 **Checkpoint**: At this point, User Story 15 should work independently
 
@@ -409,16 +409,16 @@
 
 ### Tests for User Story 16 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T125 [P] [US16] Contract test for user management endpoint in backend/tests/contract/test_user_management.py
-- [ ] T126 [P] [US16] Integration test for user role functionality in backend/tests/integration/test_user_management.py
+- [x] T125 [P] [US16] Contract test for user management endpoint in backend/tests/contract/test_user_management.py
+- [x] T126 [P] [US16] Integration test for user role functionality in backend/tests/integration/test_user_management.py
 
 ### Implementation for User Story 16
 
-- [ ] T127 [P] [US16] Create User model in backend/src/models/user.py
-- [ ] T128 [US16] Implement user management service in backend/src/services/user_service.py
-- [ ] T129 [US16] Create user management endpoint in backend/src/api/v1/users.py
-- [ ] T130 [US16] Create user management UI page in frontend/src/pages/UserManagement.tsx
-- [ ] T131 [US16] Implement role-based access controls in backend/src/auth/authorization.py
+- [x] T127 [P] [US16] Create User model in backend/src/models/user.py
+- [x] T128 [US16] Implement user management service in backend/src/services/user_service.py
+- [x] T129 [US16] Create user management endpoint in backend/src/api/v1/users.py
+- [x] T130 [US16] Create user management UI page in frontend/src/pages/UserManagement.tsx
+- [x] T131 [US16] Implement role-based access controls in backend/src/auth/authorization.py
 
 **Checkpoint**: At this point, User Story 16 should work independently
 
