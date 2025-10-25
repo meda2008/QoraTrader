@@ -89,26 +89,26 @@
 
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T029 [P] [US2] Contract test for order placement endpoint in backend/tests/contract/test_orders.py
-- [ ] T030 [P] [US2] Contract test for account info retrieval endpoint in backend/tests/contract/test_accounts.py
-- [ ] T031 [P] [US2] Integration test for live trading workflow in backend/tests/integration/test_live_trading.py
+- [x] T029 [P] [US2] Contract test for order placement endpoint in backend/tests/contract/test_orders.py
+- [x] T030 [P] [US2] Contract test for account info retrieval endpoint in backend/tests/contract/test_accounts.py
+- [x] T031 [P] [US2] Integration test for live trading workflow in backend/tests/integration/test_live_trading.py
 
 ### Implementation for User Story 2
 
-- [ ] T032 [P] [US2] Create Order model in backend/src/models/order.py
-- [ ] T033 [P] [US2] Create Trade model in backend/src/models/trade.py
-- [ ] T034 [P] [US2] Create Account model in backend/src/models/account.py
-- [ ] T035 [P] [US2] Create Position model in backend/src/models/position.py
-- [ ] T036 [US2] Implement OrderService in backend/src/services/order_service.py
-- [ ] T037 [US2] Implement TradeService in backend/src/services/trade_service.py
-- [ ] T038 [US2] Implement AccountService in backend/src/services/account_service.py
-- [ ] T039 [US2] Implement PositionService in backend/src/services/position_service.py
-- [ ] T040 [US2] Implement order placement endpoint in backend/src/api/v1/orders.py
-- [ ] T041 [US2] Implement account info retrieval endpoint in backend/src/api/v1/accounts.py
-- [ ] T042 [US2] Implement position management endpoint in backend/src/api/v1/positions.py
-- [ ] T043 [US2] Create miniQMT API adapter for exchange connection in backend/src/exchanges/miniqmt_adapter.py
-- [ ] T044 [US2] Add validation and error handling for trading operations
-- [ ] T045 [US2] Add logging for trading operations
+- [x] T032 [P] [US2] Create Order model in backend/src/models/order.py
+- [x] T033 [P] [US2] Create Trade model in backend/src/models/trade.py
+- [x] T034 [P] [US2] Create Account model in backend/src/models/account.py
+- [x] T035 [P] [US2] Create Position model in backend/src/models/position.py
+- [x] T036 [US2] Implement OrderService in backend/src/services/order_service.py
+- [x] T037 [US2] Implement TradeService in backend/src/services/trade_service.py
+- [x] T038 [US2] Implement AccountService in backend/src/services/account_service.py
+- [x] T039 [US2] Implement PositionService in backend/src/services/position_service.py
+- [x] T040 [US2] Implement order placement endpoint in backend/src/api/v1/orders.py
+- [x] T041 [US2] Implement account info retrieval endpoint in backend/src/api/v1/accounts.py
+- [x] T042 [US2] Implement position management endpoint in backend/src/api/v1/positions.py
+- [x] T043 [US2] Create miniQMT API adapter for exchange connection in backend/src/exchanges/miniqmt_adapter.py
+- [x] T044 [US2] Add validation and error handling for trading operations
+- [x] T045 [US2] Add logging for trading operations
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -122,16 +122,16 @@
 
 ### Tests for User Story 5 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T046 [P] [US5] Integration test for full system deployment in tests/integration/test_deployment.py
+- [x] T046 [P] [US5] Integration test for full system deployment in tests/integration/test_deployment.py
 
 ### Implementation for User Story 5
 
-- [ ] T047 [US5] Update docker-compose.yml for production deployment in docker/docker-compose.prod.yml
-- [ ] T048 [US5] Create deployment script in scripts/deploy.sh
-- [ ] T049 [US5] Create health check endpoint in backend/src/api/v1/health.py
-- [ ] T050 [US5] Implement automatic database initialization in db/init/
-- [ ] T051 [US5] Create environment configuration templates in docker/.env.example
-- [ ] T052 [US5] Add deployment documentation in docs/deployment-guide.md
+- [x] T047 [US5] Update docker-compose.yml for production deployment in docker/docker-compose.prod.yml
+- [x] T048 [US5] Create deployment script in scripts/deploy.sh
+- [x] T049 [US5] Create health check endpoint in backend/src/api/v1/health.py
+- [x] T050 [US5] Implement automatic database initialization in db/init/
+- [x] T051 [US5] Create environment configuration templates in docker/.env.example
+- [x] T052 [US5] Add deployment documentation in docs/deployment-guide.md
 
 **Checkpoint**: At this point, User Stories 1, 2 AND 5 should all work independently
 
