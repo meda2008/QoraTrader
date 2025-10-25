@@ -5,6 +5,24 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
+## Clarifications
+
+<!--
+  ACTION REQUIRED: The content in this section represents placeholder questions.
+  Fill them out with the right clarifications.
+  
+  Format:
+  ### Session [DATE]
+  
+  - Q: [Question about requirement or constraint] → A: [Answer with specific details]
+  - Q: [Another question] → A: [Another answer]
+-->
+
+### Session [DATE]
+
+- Q: [NEEDS CLARIFICATION: question about requirement] → A: [specific answer with details]
+- Q: [NEEDS CLARIFICATION: another question] → A: [another specific answer]
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--
@@ -113,4 +131,3 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
-

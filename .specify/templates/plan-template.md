@@ -32,7 +32,7 @@
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 **I. 清晰简洁与策略插件化原则**: ✅ 符合 - 设计支持策略作为独立插件实现，通过标准化接口与核心引擎解耦
-**II. 严格的TDD与回测验证原则**: ✅ 符合 - 计划使用pytest进行测试驱动开发，包含回测验证和Walk Forward Analysis
+**II. 严格的TDD与回测验证原则**: ✅ 符合 - 计划使用pytest进行测试驱动开发，包含回测验证
 **III. 工具一致性与API优先设计原则**: ✅ 符合 - 计划使用标准化工具栈和API优先设计
 **IV. 语义化版本控制与策略管理原则**: ✅ 符合 - 计划支持策略版本管理
 **V. 统一用户体验与系统性能原则**: ✅ 符合 - 计划包含性能目标和UI一致性设计
@@ -41,7 +41,7 @@
 
 ### 重新检查结果 (设计后):
 - 策略插件化: 通过Strategy接口和插件系统实现
-- TDD实践: pytest用于单元、集成和契约测试，包含Walk Forward Analysis
+- TDD实践: pytest用于单元、集成和契约测试
 - API优先: OpenAPI规范定义在contracts/目录
 - 性能目标: <1ms P99延迟，通过异步架构实现
 - 安全标准: 配置文件中敏感信息安全处理
@@ -110,10 +110,4 @@ directories captured above]
 
 ## Complexity Tracking
 
-*Fill ONLY if Constitution Check has violations that must be justified*
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
-
+*Not required as all Constitution Check gates passed.*
