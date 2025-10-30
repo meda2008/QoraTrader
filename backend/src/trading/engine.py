@@ -4,7 +4,7 @@ from enum import Enum
 from datetime import datetime
 import asyncio
 import logging
-from src.models.base import Order, Strategy, Account, Position, Trade
+from src.models import Order, Strategy, Account, Position, Trade
 from src.events.bus import publish_event, EventType
 from src.database import get_db
 from sqlalchemy.orm import Session

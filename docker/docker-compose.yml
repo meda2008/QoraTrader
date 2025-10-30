@@ -3,64 +3,62 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ..
-      dockerfile: docker/backend.Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://qoratrader:qoratrader@db:5432/qoratrader
-      - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_TOKEN=influxdb_token
-      - INFLUXDB_ORG=org
-      - INFLUXDB_BUCKET=bucket
+      - DATABASE_URL=postgresql://user:password@db:5432/qora_trader
+      - TIMESCALEDB_URL=postgresql://user:password@timescale:5432/qora_trader
     depends_on:
       - db
-      - influxdb
+      - timescale
     volumes:
-      - ./backend:/app  # For development
-    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload  # For development
+      - ./backend:/app
+    networks:
+      - qora_network
 
   frontend:
     build:
-      context: ..
-      dockerfile: docker/frontend.Dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://localhost:8000
     depends_on:
       - backend
+    networks:
+      - qora_network
 
   db:
     image: postgres:15
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-      - ./db/init:/docker-entrypoint-initdb.d
     environment:
-      - POSTGRES_DB=qoratrader
-      - POSTGRES_USER=qoratrader
-      - POSTGRES_PASSWORD=qoratrader
+      - POSTGRES_DB=qora_trader
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
     ports:
       - "5432:5432"
-
-  influxdb:
-    image: influxdb:2.7
     volumes:
-      - influxdb_data:/var/lib/influxdb2
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=influxdb_password
-      - DOCKER_INFLUXDB_INIT_ORG=org
-      - DOCKER_INFLUXDB_INIT_BUCKET=bucket
-    ports:
-      - "8086:8086"
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - qora_network
 
-  redis:
-    image: redis:7-alpine
+  timescale:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      - POSTGRES_DB=qora_trader
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
     ports:
-      - "6379:6379"
+      - "5433:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    networks:
+      - qora_network
 
 volumes:
   postgres_data:
-  influxdb_data:
+  timescale_data:
+
+networks:
+  qora_network:
+    driver: bridge

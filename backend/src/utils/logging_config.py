@@ -1,51 +1,43 @@
 import logging
+import sys
 from logging.handlers import RotatingFileHandler
-import os
-from src.config.settings import settings
+from pathlib import Path
+from ..config.settings import config
 
 def setup_logging():
-    """
-    Setup logging configuration for the application
-    """
-    # Create logs directory if it doesn't exist
-    if not os.path.exists("logs"):
-        os.makedirs("logs")
+    """设置日志记录"""
+    # 创建日志目录
+    log_dir = Path(config.LOG_FILE).parent
+    log_dir.mkdir(parents=True, exist_ok=True)
     
-    # Set up root logger
-    root_logger = logging.getLogger()
-    root_logger.setLevel(getattr(logging, settings.LOG_LEVEL))
+    # 创建logger
+    logger = logging.getLogger()
+    logger.setLevel(getattr(logging, config.LOG_LEVEL.upper()))
     
-    # Create formatter
-    formatter = logging.Formatter(settings.LOG_FORMAT)
+    # 创建格式器
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     
-    # Clear any existing handlers
-    root_logger.handlers.clear()
-    
-    # Create console handler
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(getattr(logging, settings.LOG_LEVEL))
-    console_handler.setFormatter(formatter)
-    
-    # Create file handler with rotation
+    # 文件处理器 - 使用轮转日志
     file_handler = RotatingFileHandler(
-        "logs/app.log",
+        config.LOG_FILE,
         maxBytes=10*1024*1024,  # 10MB
         backupCount=5
     )
-    file_handler.setLevel(getattr(logging, settings.LOG_LEVEL))
     file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
     
-    # Add handlers to root logger
-    root_logger.addHandler(console_handler)
-    root_logger.addHandler(file_handler)
+    # 控制台处理器
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
     
-    # Set specific log levels for libraries to reduce noise
-    logging.getLogger("uvicorn").setLevel(logging.WARNING)
-    logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    # 防止重复添加处理器
+    logger.propagate = False
 
 def get_logger(name: str) -> logging.Logger:
-    """
-    Get a logger with the specified name
-    """
+    """获取命名的日志记录器"""
     return logging.getLogger(name)
+
+setup_logging()

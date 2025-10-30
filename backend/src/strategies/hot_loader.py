@@ -1,206 +1,184 @@
-"""
-Strategy hot loader
-This module handles hot loading of trading strategies without restarting the system
-"""
-import os
-import sys
-import importlib
+import asyncio
 import importlib.util
-from typing import Dict, Any, Optional
-import logging
-from src.models.base import Strategy
-from src.database import get_db
-from src.utils.error_handler import CustomException
-
-logger = logging.getLogger(__name__)
+import sys
+import os
+from pathlib import Path
+from typing import Dict, Optional
+from ..strategies.strategy_interface import StrategyInterface, StrategyLoader
+from ..models.strategy import Strategy
+from ..core.trading_engine import CoreEngine
 
 class StrategyHotLoader:
     """
-    Hot loader for trading strategies
+    策略热加载器，允许在不重启系统的情况下加载、卸载或更新策略
     """
     
-    def __init__(self):
-        self._loaded_strategies: Dict[str, Any] = {}
-        self._strategy_modules: Dict[str, Any] = {}
-        logger.info("Strategy hot loader initialized")
+    def __init__(self, db, trading_engine: CoreEngine):
+        self.db = db
+        self.trading_engine = trading_engine
+        self.strategy_loader = StrategyLoader()
+        self.active_strategies: Dict[str, StrategyInterface] = {}
+        self.strategy_files: Dict[str, str] = {}  # 策略ID到文件路径的映射
     
-    def reload_strategy(self, strategy_id: str, strategy_code: str = None, config: Dict = None) -> bool:
+    async def load_strategy(self, strategy_id: str, file_path: Optional[str] = None) -> bool:
         """
-        Reload a strategy by ID
+        加载策略
         """
         try:
-            from sqlalchemy.orm import Session
-            db: Session = next(get_db())
+            # 获取策略信息
+            strategy = self.db.query(Strategy).filter(Strategy.id == strategy_id).first()
+            if not strategy:
+                print(f"策略 {strategy_id} 不存在")
+                return False
             
-            # Get strategy from database if not provided
-            if strategy_code is None:
-                strategy = db.query(Strategy).filter(Strategy.id == strategy_id).first()
-                if not strategy:
-                    raise CustomException(f"Strategy with ID {strategy_id} not found", 404)
-                
-                strategy_code = strategy.code
-                config = strategy.config if strategy.config else "{}"
+            if file_path:
+                # 如果提供了文件路径，更新策略的代码路径
+                strategy.code_path = file_path
+                self.db.commit()
             
-            # Create temporary file for the strategy code
-            temp_file_path = self._create_temp_strategy_file(strategy_id, strategy_code)
+            if not strategy.code_path:
+                print(f"策略 {strategy_id} 没有指定代码路径")
+                return False
             
-            # Load the strategy module
-            module_name = f"strategy_{strategy_id}"
-            
-            # If module was previously loaded, unload it first
-            if module_name in sys.modules:
-                del sys.modules[module_name]
-            
-            # Load the new module
-            spec = importlib.util.spec_from_file_location(module_name, temp_file_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            
-            # Find the strategy class in the module
-            strategy_class = None
-            for attr_name in dir(module):
-                attr = getattr(module, attr_name)
-                if (isinstance(attr, type) and 
-                    hasattr(attr, 'strategy_logic') and 
-                    callable(getattr(attr, 'strategy_logic'))):
-                    strategy_class = attr
-                    break
-            
-            if not strategy_class:
-                raise CustomException(f"No valid strategy class found in module for strategy {strategy_id}", 400)
-            
-            # Create strategy instance
-            strategy_instance = strategy_class(
-                strategy_id=strategy_id,
-                config=config
+            # 加载策略
+            strategy_instance = self.strategy_loader.load_strategy_from_file(
+                strategy_id, 
+                strategy.code_path, 
+                strategy.config
             )
             
-            # Store the loaded strategy
-            self._loaded_strategies[strategy_id] = strategy_instance
-            self._strategy_modules[strategy_id] = module
+            # 初始化策略
+            strategy_instance.initialize()
             
-            # Clean up temporary file
-            os.remove(temp_file_path)
+            # 激活策略
+            strategy_instance.activate()
             
-            logger.info(f"Strategy {strategy_id} reloaded successfully")
+            # 保存到活动策略列表
+            self.active_strategies[strategy_id] = strategy_instance
+            self.strategy_files[strategy_id] = strategy.code_path
+            
+            print(f"策略 {strategy_id} 加载成功")
             return True
-        except CustomException:
-            raise
+            
         except Exception as e:
-            logger.error(f"Error reloading strategy {strategy_id}: {str(e)}")
-            raise CustomException(f"Failed to reload strategy: {str(e)}", 500)
-        finally:
-            db.close()
-    
-    def _create_temp_strategy_file(self, strategy_id: str, strategy_code: str) -> str:
-        """
-        Create a temporary file for the strategy code
-        """
-        try:
-            # Create temp directory if it doesn't exist
-            temp_dir = "temp_strategies"
-            if not os.path.exists(temp_dir):
-                os.makedirs(temp_dir)
-            
-            # Create temp file path
-            temp_file_path = os.path.join(temp_dir, f"strategy_{strategy_id}.py")
-            
-            # Write strategy code to temp file
-            with open(temp_file_path, 'w', encoding='utf-8') as f:
-                f.write(strategy_code)
-            
-            return temp_file_path
-        except Exception as e:
-            logger.error(f"Error creating temp strategy file: {str(e)}")
-            raise CustomException(f"Failed to create temp strategy file: {str(e)}", 500)
-    
-    def get_strategy(self, strategy_id: str) -> Optional[Any]:
-        """
-        Get a loaded strategy by ID
-        """
-        return self._loaded_strategies.get(strategy_id)
-    
-    def unload_strategy(self, strategy_id: str) -> bool:
-        """
-        Unload a strategy by ID
-        """
-        try:
-            # Remove from loaded strategies
-            if strategy_id in self._loaded_strategies:
-                del self._loaded_strategies[strategy_id]
-            
-            # Remove module if loaded
-            module_name = f"strategy_{strategy_id}"
-            if module_name in sys.modules:
-                del sys.modules[module_name]
-            
-            # Remove from modules dict
-            if strategy_id in self._strategy_modules:
-                del self._strategy_modules[strategy_id]
-            
-            logger.info(f"Strategy {strategy_id} unloaded successfully")
-            return True
-        except Exception as e:
-            logger.error(f"Error unloading strategy {strategy_id}: {str(e)}")
+            print(f"加载策略 {strategy_id} 失败: {e}")
             return False
     
-    def list_loaded_strategies(self) -> Dict[str, str]:
+    async def unload_strategy(self, strategy_id: str) -> bool:
         """
-        List all loaded strategies
-        """
-        try:
-            strategy_info = {}
-            for strategy_id, strategy_instance in self._loaded_strategies.items():
-                strategy_info[strategy_id] = {
-                    "class_name": strategy_instance.__class__.__name__,
-                    "module": strategy_instance.__class__.__module__
-                }
-            return strategy_info
-        except Exception as e:
-            logger.error(f"Error listing loaded strategies: {str(e)}")
-            raise CustomException(f"Failed to list loaded strategies: {str(e)}", 500)
-    
-    def is_strategy_loaded(self, strategy_id: str) -> bool:
-        """
-        Check if a strategy is loaded
-        """
-        return strategy_id in self._loaded_strategies
-    
-    def get_strategy_status(self, strategy_id: str) -> Dict[str, Any]:
-        """
-        Get the status of a strategy
+        卸载策略
         """
         try:
-            from sqlalchemy.orm import Session
-            db: Session = next(get_db())
-            
-            # Get strategy from database
-            strategy = db.query(Strategy).filter(Strategy.id == strategy_id).first()
-            if not strategy:
-                raise CustomException(f"Strategy with ID {strategy_id} not found", 404)
-            
-            # Check if loaded
-            is_loaded = self.is_strategy_loaded(strategy_id)
-            
-            status_info = {
-                "strategy_id": strategy.id,
-                "name": strategy.name,
-                "is_loaded": is_loaded,
-                "is_active": strategy.status.value == "active",
-                "loaded_at": None,  # This would be stored elsewhere in a real implementation
-                "last_modified": strategy.updated_at.isoformat() if strategy.updated_at else None,
-                "config": strategy.config,
-                "status": strategy.status.value
-            }
-            
-            return status_info
-        except CustomException:
-            raise
+            if strategy_id in self.active_strategies:
+                # 停止策略
+                strategy_instance = self.active_strategies[strategy_id]
+                strategy_instance.stop()
+                
+                # 从活动策略中移除
+                del self.active_strategies[strategy_id]
+                
+                # 从策略加载器中卸载
+                self.strategy_loader.unload_strategy(strategy_id)
+                
+                # 如果有相关订单，可能需要取消这些订单
+                # 这里可以根据需要添加相关逻辑
+                
+                print(f"策略 {strategy_id} 卸载成功")
+                return True
+            else:
+                print(f"策略 {strategy_id} 未在运行")
+                return False
+                
         except Exception as e:
-            logger.error(f"Error getting strategy status for {strategy_id}: {str(e)}")
-            raise CustomException(f"Failed to get strategy status: {str(e)}", 500)
-        finally:
-            db.close()
-
-# Global strategy hot loader instance
-strategy_hot_loader = StrategyHotLoader()
+            print(f"卸载策略 {strategy_id} 失败: {e}")
+            return False
+    
+    async def reload_strategy(self, strategy_id: str, file_path: Optional[str] = None) -> bool:
+        """
+        重新加载策略
+        """
+        # 首先卸载当前策略
+        unload_success = await self.unload_strategy(strategy_id)
+        if not unload_success:
+            print(f"重新加载策略 {strategy_id} 失败：无法卸载原策略")
+            return False
+        
+        # 然后加载新策略
+        if file_path:
+            load_success = await self.load_strategy(strategy_id, file_path)
+        else:
+            # 如果未提供文件路径，使用原路径重新加载
+            original_path = self.strategy_files.get(strategy_id)
+            if original_path:
+                load_success = await self.load_strategy(strategy_id, original_path)
+            else:
+                print(f"重新加载策略 {strategy_id} 失败：未找到原文件路径")
+                return False
+        
+        if load_success:
+            print(f"策略 {strategy_id} 重新加载成功")
+            return True
+        else:
+            print(f"策略 {strategy_id} 重新加载失败")
+            return False
+    
+    async def start_strategy(self, strategy_id: str) -> bool:
+        """
+        启动策略
+        """
+        if strategy_id in self.active_strategies:
+            self.active_strategies[strategy_id].activate()
+            print(f"策略 {strategy_id} 启动成功")
+            return True
+        else:
+            print(f"策略 {strategy_id} 未加载，无法启动")
+            return False
+    
+    async def pause_strategy(self, strategy_id: str) -> bool:
+        """
+        暂停策略
+        """
+        if strategy_id in self.active_strategies:
+            self.active_strategies[strategy_id].pause()
+            print(f"策略 {strategy_id} 暂停成功")
+            return True
+        else:
+            print(f"策略 {strategy_id} 未在运行，无法暂停")
+            return False
+    
+    def get_active_strategies(self) -> Dict[str, StrategyInterface]:
+        """
+        获取所有活动策略
+        """
+        return self.active_strategies.copy()
+    
+    async def process_market_data(self, symbol: str, data: Dict[str, any]):
+        """
+        将市场数据分发给所有活动策略
+        """
+        for strategy_id, strategy in self.active_strategies.items():
+            if not strategy.is_paused:
+                try:
+                    strategy.on_market_data(symbol, data)
+                except Exception as e:
+                    print(f"策略 {strategy_id} 处理市场数据时出错: {e}")
+    
+    async def process_order_update(self, order_id: str, status: str):
+        """
+        将订单更新分发给相关策略
+        """
+        for strategy_id, strategy in self.active_strategies.items():
+            try:
+                strategy.on_order_update(order_id, status)
+            except Exception as e:
+                print(f"策略 {strategy_id} 处理订单更新时出错: {e}")
+    
+    async def process_trade(self, trade: Dict[str, any]):
+        """
+        将成交信息分发给相关策略
+        """
+        for strategy_id, strategy in self.active_strategies.items():
+            try:
+                strategy.on_trade(trade)
+            except Exception as e:
+                print(f"策略 {strategy_id} 处理成交信息时出错: {e}")

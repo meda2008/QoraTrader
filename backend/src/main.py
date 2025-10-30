@@ -1,51 +1,29 @@
 from fastapi import FastAPI
-from src.api.v1 import api_router
-from src.config.settings import settings
-from src.utils.logging_config import setup_logging
-from src.utils.error_handler import init_error_handlers
-from src.utils.middleware import setup_middleware
-import uvicorn
-import os
+from .api.v1 import api_router
+from .config.settings import config
 
 def create_app() -> FastAPI:
-    """
-    Create and configure the FastAPI application
-    """
-    # Setup logging
-    setup_logging()
-    
-    # Create FastAPI instance
     app = FastAPI(
-        title=settings.APP_NAME,
-        description=settings.APP_DESCRIPTION,
-        version=settings.APP_VERSION,
-        openapi_url=settings.OPENAPI_URL,
-        docs_url=settings.DOCS_URL,
-        redoc_url=settings.REDOC_URL
+        title=config.PROJECT_NAME,
+        version="1.0.0"
     )
     
-    # Setup middleware
-    setup_middleware(app)
+    # Include API routes
+    app.include_router(api_router, prefix=config.API_V1_STR)
     
-    # Initialize error handlers
-    init_error_handlers(app)
-    
-    # Include API routers
-    app.include_router(api_router, prefix=settings.API_V1_STR)
+    @app.get("/")
+    def read_root():
+        return {"message": "Welcome to QoraTrader API"}
     
     @app.get("/health")
-    async def health_check():
-        return {"status": "healthy", "timestamp": "2025-10-22T10:30:00Z"}
+    def health_check():
+        return {"status": "healthy", "service": "QoraTrader API"}
     
     return app
 
-# Create the application instance
 app = create_app()
 
-if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host=settings.SERVER_HOST,
-        port=settings.SERVER_PORT,
-        reload=settings.DEBUG_MODE
-    )
+# For running with uvicorn directly
+if __name__ == "main":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

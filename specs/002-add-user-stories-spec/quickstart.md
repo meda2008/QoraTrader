@@ -1,181 +1,144 @@
 # Quickstart Guide: 量化交易系统
 
-## 项目概述
-本项目是一个支持策略回测、实盘交易和风险管理的量化交易平台。系统采用微服务架构，使用Python/FastAPI构建后端服务，React构建前端界面。
-
 ## 环境要求
+
 - Docker 20.10+
 - Docker Compose v2+
 - Python 3.11+
-- Node.js 18+ (用于前端构建)
+- Node.js 16+ (可选，用于前端开发)
 
-## 本地开发环境搭建
+## 快速部署
 
-### 1. 克隆项目
+### 1. 克隆仓库
 ```bash
 git clone <repository-url>
 cd QoraTrader
 ```
 
+### 2. 配置环境变量
+```bash
+cp .env.example .env
+# 编辑 .env 文件以配置数据库连接、交易所API密钥等
+```
+
+### 3. 启动服务
+```bash
+# 使用Docker Compose一键启动所有服务
+docker-compose up -d
+
+# 或使用便捷脚本（如果提供）
+./scripts/deploy.sh
+```
+
+### 4. 验证部署
+```bash
+# 检查所有服务状态
+docker-compose ps
+
+# 访问Web界面
+open http://localhost:8080
+
+# 检查API健康状态
+curl http://localhost:8000/health
+```
+
+## 本地开发环境设置
+
+### 1. 安装依赖
+```bash
+# 后端
+pip install -r requirements.txt
+
+# 前端（如果适用）
+cd frontend && npm install
+```
+
 ### 2. 启动开发环境
 ```bash
-# 启动所有服务
-docker-compose -f docker/docker-compose.yml up -d
+# 启动后端服务
+python -m backend.main
 
-# 或者只启动后端服务进行开发
-docker-compose -f docker/docker-compose.yml up backend
+# 在另一个终端中启动前端（如果适用）
+cd frontend && npm run dev
 ```
 
-### 3. 初始化数据库
+### 3. 运行测试
 ```bash
-# 等待数据库服务启动后运行迁移
-docker exec -it qoratrader-backend-1 python -m db.migrate
+# 运行后端测试
+pytest
+
+# 运行前端测试（如果适用）
+cd frontend && npm run test
 ```
 
-## 项目结构说明
-```
-QoraTrader/
-├── backend/                 # 后端服务 (Python/FastAPI)
-│   ├── src/
-│   │   ├── models/         # 数据模型
-│   │   ├── services/       # 业务逻辑服务
-│   │   ├── api/            # API端点
-│   │   ├── strategies/     # 策略引擎
-│   │   └── risk/           # 风控模块
-│   └── tests/
-├── frontend/                # 前端应用 (React/TypeScript)
-│   ├── src/
-│   │   ├── components/     # UI组件
-│   │   ├── pages/          # 页面组件
-│   │   └── services/       # API服务
-│   └── tests/
-├── db/                      # 数据库相关
-│   ├── migrations/         # 数据库迁移脚本
-│   └── schemas/            # 数据库模式
-├── docker/                  # Docker配置
-└── contracts/               # API契约定义
-```
+## 核心功能演示
 
-## 核心功能开发指南
+### 1. 创建并运行策略
 
-### 1. 创建新策略
-1. 在 `backend/src/strategies/` 目录下创建新策略文件
-2. 继承基类 `BaseStrategy` 并实现必要方法
-3. 定义策略参数和逻辑
+1. 登录Web界面
+2. 导航到"策略管理"页面
+3. 点击"新建策略"，上传您的策略文件
+4. 配置策略参数
+5. 点击"激活"启动策略
 
-```python
-from src.strategies.base import BaseStrategy
+### 2. 执行回测
 
-class MyStrategy(BaseStrategy):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.param1 = kwargs.get('param1', 10)
-        
-    def on_bar(self, symbol: str, bar_data):
-        # 实现策略逻辑
-        pass
-```
+1. 在"策略管理"页面选择一个策略
+2. 点击"回测"按钮
+3. 设置回测参数（时间范围、初始资金等）
+4. 启动回测并查看结果报告
 
-### 2. 添加新API端点
-1. 在 `backend/src/api/` 目录下创建新路由文件
-2. 使用FastAPI定义端点
+### 3. 监控实时交易
 
-```python
-from fastapi import APIRouter, Depends
-from src.dependencies import get_strategy_service
+1. 访问"实时监控"页面
+2. 查看活跃策略的状态和表现
+3. 监控订单执行和持仓变化
 
-router = APIRouter()
+## API访问示例
 
-@router.get("/strategies/{strategy_id}")
-async def get_strategy(strategy_id: str, service = Depends(get_strategy_service)):
-    return await service.get_strategy(strategy_id)
-```
-
-### 3. 数据模型变更
-1. 在 `backend/src/models/` 修改模型定义
-2. 使用Alembic生成迁移文件
-3. 更新 `db/schemas/` 中的数据库模式定义
-
-## 测试指南
-
-### 后端测试
+### 获取所有策略
 ```bash
-# 运行所有测试
-cd backend
-python -m pytest tests/
-
-# 运行单元测试
-python -m pytest tests/unit/
-
-# 运行集成测试
-python -m pytest tests/integration/
-
-# 运行契约测试
-python -m pytest tests/contract/
+curl -H "Authorization: Bearer <your-token>" \
+     http://localhost:8000/api/v1/strategies
 ```
 
-### 前端测试
+### 创建新订单
 ```bash
-# 运行前端测试
-cd frontend
-npm test
+curl -X POST \
+     -H "Authorization: Bearer <your-token>" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "strategyId": "your-strategy-id",
+       "accountId": "your-account-id",
+       "symbol": "000001",
+       "direction": "买入",
+       "orderType": "限价单",
+       "price": 10.5,
+       "quantity": 1000
+     }' \
+     http://localhost:8000/api/v1/orders
 ```
 
-## 部署说明
+## 故障排除
 
-### 本地部署
-```bash
-# 构建并启动所有服务
-docker-compose -f docker/docker-compose.yml up --build -d
+### 服务未启动
+- 检查日志：`docker-compose logs`
+- 确认端口未被占用
+- 验证环境变量配置
 
-# 检查服务状态
-docker-compose -f docker/docker-compose.yml ps
-```
+### 策略无法激活
+- 确认策略文件格式正确
+- 检查策略代码语法
+- 验证依赖项是否安装
 
-### 生产部署
-1. 配置环境变量文件 `.env.production`
-2. 更新 `docker-compose.prod.yml` 中的配置
-3. 部署到服务器
+### API访问失败
+- 确认认证令牌有效
+- 检查网络连接
+- 验证API端点URL
 
-```bash
-# 生产环境部署
-docker-compose -f docker/docker-compose.prod.yml up -d
-```
+## 进一步定制
 
-## 调试技巧
-
-### 后端调试
-- 查看服务日志: `docker logs qoratrader-backend-1`
-- 进入容器: `docker exec -it qoratrader-backend-1 bash`
-- 使用日志级别: 设置 `LOG_LEVEL=DEBUG`
-
-### 前端调试
-- 开发模式: `npm start` (启用热重载)
-- 生产构建: `npm run build`
-- 检查网络请求: 浏览器开发者工具的网络面板
-
-## 重要配置
-
-### 环境变量
-在 `.env` 文件中配置:
-```
-# 数据库配置
-DB_HOST=postgres
-DB_PORT=5432
-DB_NAME=qoratrader
-DB_USER=qoratrader_user
-DB_PASSWORD=qoratrader_pass
-
-# 交易所API配置
-EXCHANGE_API_KEY=your_api_key
-EXCHANGE_API_SECRET=your_api_secret
-
-# 风控配置
-RISK_MAX_POSITION_SIZE=100000
-RISK_MAX_DAILY_LOSS=5000
-```
-
-### 性能调优
-- 核心交易路径延迟: <1ms P99
-- 订单处理吞吐量: >1000 订单/秒
-- UI响应时间: <2秒加载时间
+- 配置额外的交易所连接
+- 添加自定义指标库
+- 调整风控参数
+- 集成其他数据源

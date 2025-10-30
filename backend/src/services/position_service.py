@@ -1,204 +1,89 @@
-from typing import Dict, List, Optional
-from datetime import datetime
-import logging
-from src.models.base import Position, Account, Strategy
-from src.database import get_db
-from src.utils.error_handler import CustomException
-
-logger = logging.getLogger(__name__)
+from typing import List, Optional
+from sqlalchemy.orm import Session
+from ..models.position import Position
+from ..models.account import Account
+from ..models.strategy import Strategy
 
 class PositionService:
-    """
-    Service for managing positions
-    """
-    
-    def __init__(self):
-        logger.info("Position service initialized")
-    
-    async def get_position(self, position_id: str) -> Optional[Position]:
-        """
-        Get a position by ID
-        """
-        try:
-            from sqlalchemy.orm import Session
-            db: Session = next(get_db())
-            
-            position = db.query(Position).filter(Position.id == position_id).first()
-            if not position:
-                raise CustomException(f"Position with ID {position_id} not found", 404)
-            
-            return position
-        except CustomException:
-            raise
-        except Exception as e:
-            logger.error(f"Error retrieving position {position_id}: {str(e)}")
-            raise CustomException(f"Failed to retrieve position: {str(e)}", 500)
-        finally:
-            db.close()
-    
-    async def get_position_by_account_and_symbol(self, account_id: str, symbol: str) -> Optional[Position]:
-        """
-        Get a position for a specific account and symbol
-        """
-        try:
-            from sqlalchemy.orm import Session
-            db: Session = next(get_db())
-            
-            position = db.query(Position).filter(
-                Position.account_id == account_id,
-                Position.symbol == symbol
-            ).first()
-            
-            return position
-        except Exception as e:
-            logger.error(f"Error retrieving position for account {account_id} and symbol {symbol}: {str(e)}")
-            raise CustomException(f"Failed to retrieve position: {str(e)}", 500)
-        finally:
-            db.close()
-    
-    async def get_positions_by_account(self, account_id: str) -> List[Position]:
-        """
-        Get all positions for a specific account
-        """
-        try:
-            from sqlalchemy.orm import Session
-            db: Session = next(get_db())
-            
-            positions = db.query(Position).filter(Position.account_id == account_id).all()
-            return positions
-        except Exception as e:
-            logger.error(f"Error retrieving positions for account {account_id}: {str(e)}")
-            raise CustomException(f"Failed to retrieve positions: {str(e)}", 500)
-        finally:
-            db.close()
-    
-    async def get_positions_by_strategy(self, strategy_id: str) -> List[Position]:
-        """
-        Get all positions for a specific strategy
-        """
-        try:
-            from sqlalchemy.orm import Session
-            db: Session = next(get_db())
-            
-            positions = db.query(Position).filter(Position.strategy_id == strategy_id).all()
-            return positions
-        except Exception as e:
-            logger.error(f"Error retrieving positions for strategy {strategy_id}: {str(e)}")
-            raise CustomException(f"Failed to retrieve positions: {str(e)}", 500)
-        finally:
-            db.close()
-    
-    async def update_position(self, position_data: Dict) -> Optional[Position]:
-        """
-        Update a position after a trade
-        This method would typically be called by the trading engine after a trade execution
-        """
-        try:
-            from sqlalchemy.orm import Session
-            db: Session = next(get_db())
-            
-            # Get the existing position or create a new one if it doesn't exist
-            position = await self.get_position_by_account_and_symbol(
-                position_data['account_id'], 
-                position_data['symbol']
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_position(self, account_id: str, strategy_id: str, symbol: str) -> Optional[Position]:
+        """获取特定账户、策略和交易标的的持仓"""
+        return self.db.query(Position).filter(
+            Position.account_id == account_id,
+            Position.strategy_id == strategy_id,
+            Position.symbol == symbol
+        ).first()
+
+    def get_positions_by_account(self, account_id: str) -> List[Position]:
+        """获取账户的所有持仓"""
+        return self.db.query(Position).filter(Position.account_id == account_id).all()
+
+    def get_positions_by_strategy(self, strategy_id: str) -> List[Position]:
+        """获取策略的所有持仓"""
+        return self.db.query(Position).filter(Position.strategy_id == strategy_id).all()
+
+    def update_position(self, account_id: str, strategy_id: str, symbol: str, 
+                       direction: str, quantity: int, available_quantity: int, 
+                       cost: float, current_price: float = None) -> Position:
+        """更新持仓信息"""
+        position = self.get_position(account_id, strategy_id, symbol)
+        if position:
+            # 更新现有持仓
+            position.position_quantity += quantity
+            position.available_quantity += available_quantity
+            if cost > 0:  # 如果提供了成本价，则更新
+                total_qty = position.position_quantity
+                if total_qty > 0:
+                    position.position_cost = ((position.position_cost * (total_qty - quantity)) + (cost * quantity)) / total_qty
+            if current_price:
+                position.current_price = current_price
+                position.floating_pnl = (current_price - position.position_cost) * position.position_quantity
+                if position.position_cost != 0:
+                    position.pnl_ratio = (current_price - position.position_cost) / position.position_cost * 100
+        else:
+            # 创建新持仓
+            position = Position(
+                account_id=account_id,
+                strategy_id=strategy_id,
+                symbol=symbol,
+                direction=direction,
+                position_quantity=quantity,
+                available_quantity=available_quantity,
+                position_cost=cost,
+                current_price=current_price or cost,
             )
-            
-            if not position:
-                # Create a new position if one doesn't exist
-                position = Position(
-                    account_id=position_data['account_id'],
-                    strategy_id=position_data['strategy_id'],
-                    symbol=position_data['symbol'],
-                    direction=position_data['direction'],
-                    volume=position_data['volume'],
-                    available_volume=position_data['available_volume'],
-                    avg_price=position_data['avg_price'],
-                    unrealized_pnl=0.0,
-                    realized_pnl=0.0
-                )
-                db.add(position)
-            else:
-                # Update existing position
-                position.volume += position_data.get('volume_delta', 0)
-                position.available_volume += position_data.get('available_volume_delta', 0)
-                
-                # Update average price if buying more of the same position
-                if position_data.get('volume_delta', 0) > 0:
-                    total_value = (position.avg_price * (position.volume - position_data['volume_delta'])) + \
-                                  (position_data['avg_price'] * position_data['volume_delta'])
-                    if position.volume != 0:
-                        position.avg_price = total_value / position.volume
-                
-                # If position is closed (volume is 0), reset avg_price
-                if position.volume == 0:
-                    position.avg_price = 0.0
-                    position.available_volume = 0.0
-            
-            db.commit()
-            db.refresh(position)
-            
-            logger.info(f"Position for {position.symbol} updated: volume={position.volume}, avg_price={position.avg_price}")
-            return position
-        except CustomException:
-            raise
-        except Exception as e:
-            logger.error(f"Error updating position: {str(e)}")
-            raise CustomException(f"Failed to update position: {str(e)}", 500)
-        finally:
-            db.close()
-    
-    async def calculate_unrealized_pnl(self, position: Position, current_price: float) -> float:
-        """
-        Calculate the unrealized profit and loss for a position
-        """
-        if position.volume == 0:
-            return 0.0
+            if current_price:
+                position.floating_pnl = (current_price - cost) * quantity
+                if cost != 0:
+                    position.pnl_ratio = (current_price - cost) / cost * 100
+            self.db.add(position)
         
-        try:
-            from src.models.base import PositionDirection
+        self.db.commit()
+        if position:
+            self.db.refresh(position)
+        return position
+
+    def reduce_position(self, account_id: str, strategy_id: str, symbol: str, 
+                        quantity: int, current_price: float = None) -> Optional[Position]:
+        """减少持仓（平仓）"""
+        position = self.get_position(account_id, strategy_id, symbol)
+        if position and position.position_quantity >= quantity:
+            position.position_quantity -= quantity
+            position.available_quantity -= quantity
             
-            if position.direction == PositionDirection.LONG:
-                # Long position: PnL = (current_price - avg_price) * volume
-                pnl = (current_price - position.avg_price) * position.volume
-            else:  # SHORT
-                # Short position: PnL = (avg_price - current_price) * volume
-                pnl = (position.avg_price - current_price) * position.volume
+            if current_price:
+                position.current_price = current_price
+                position.floating_pnl = (current_price - position.position_cost) * position.position_quantity
+                if position.position_cost != 0:
+                    position.pnl_ratio = (current_price - position.position_cost) / position.position_cost * 100
             
-            return pnl
-        except Exception as e:
-            logger.error(f"Error calculating unrealized PnL for position {position.id}: {str(e)}")
-            raise CustomException(f"Failed to calculate PnL: {str(e)}", 500)
-    
-    async def close_position(self, position_id: str) -> bool:
-        """
-        Close a position (set volume to 0)
-        """
-        try:
-            from sqlalchemy.orm import Session
-            db: Session = next(get_db())
+            # 如果持仓数量为0，可以考虑删除记录或保留以供历史查询
+            if position.position_quantity == 0:
+                position.position_cost = 0.0
             
-            position = db.query(Position).filter(Position.id == position_id).first()
-            if not position:
-                raise CustomException(f"Position with ID {position_id} not found", 404)
-            
-            # Move the current unrealized PnL to realized PnL
-            # This would require getting the current market price, which we'll simulate
-            # In a real implementation, you'd get the current market price from the market data service
-            current_price = 100.0  # Simulated current price
-            unrealized_pnl = await self.calculate_unrealized_pnl(position, current_price)
-            
-            position.realized_pnl += unrealized_pnl
-            position.volume = 0
-            position.available_volume = 0
-            position.avg_price = 0.0
-            
-            db.commit()
-            logger.info(f"Position {position_id} closed, realized PnL: {unrealized_pnl}")
-            return True
-        except CustomException:
-            raise
-        except Exception as e:
-            logger.error(f"Error closing position {position_id}: {str(e)}")
-            raise CustomException(f"Failed to close position: {str(e)}", 500)
-        finally:
-            db.close()
+            self.db.commit()
+            self.db.refresh(position)
+        
+        return position

@@ -6,7 +6,7 @@ import pytest
 import asyncio
 from unittest.mock import patch, MagicMock
 from src.trading.engine import TradingEngine
-from src.models.base import Order, OrderType, OrderSide, Strategy, Account, Position
+from src.models import Order, OrderType, OrderSide, Strategy, Account, Position
 from src.utils.error_handler import CustomException
 
 @patch('src.database.get_db')

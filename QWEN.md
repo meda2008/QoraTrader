@@ -22,7 +22,7 @@ Python 3.11+ (for trading engine and backtesting) and TypeScript/JavaScript (for
 
 ## Recent Changes
 - 002-add-user-stories-spec: Added Python 3.11+ (for trading engine and backtesting) and TypeScript/JavaScript (for web UI) + FastAPI, pandas, numpy, TA-Lib, Docker, Docker Compose, miniQMT API, PostgreSQL, TimescaleDB
-- 002-add-user-stories-spec: Added Python 3.11+ (for trading engine and backtesting) and TypeScript/JavaScript (for web UI) + FastAPI, pandas, numpy, TA-Lib, Docker, Docker Compose, miniQMT API, PostgreSQL, InfluxDB (or TimescaleDB)
+- 002-add-user-stories-spec: Added Python 3.11+ (for trading engine and backtesting) and TypeScript/JavaScript (for web UI) + FastAPI, pandas, numpy, TA-Lib, Docker, Docker Compose, miniQMT API, PostgreSQL, TimescaleDB
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

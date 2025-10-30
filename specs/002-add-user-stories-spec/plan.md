@@ -7,22 +7,28 @@
 
 ## Summary
 
-本项目实现一个量化交易系统，支持策略回测、实盘交易、策略热加载、风险管理和用户界面监控等功能。系统采用事件驱动架构，使用Python作为主要开发语言，通过FastAPI提供API服务，结合PostgreSQL和TimescaleDB处理交易和行情数据。
+本实施计划涵盖了量化交易系统的核心用户故事实现。主要需求包括：
+1. 策略回测系统：支持使用历史数据验证策略盈利能力
+2. 实盘交易系统：支持与交易所连接进行实时交易
+3. 策略热加载：支持运行时动态加载/更新策略
+4. 交易接口扩展：支持接入多个交易所
+5. 一键部署：通过容器化实现快速环境部署
+6. 指标库集成：支持外部技术指标库
+7. 策略监控和风险控制：提供可视化仪表盘和风控机制
 
-核心技术包括：插件化策略引擎、低延迟事件处理、多交易所API接入、实时风控系统和可视化分析界面。系统设计满足毫秒级交易延迟、99.99%可用性和20+并发策略运行的要求。
+技术方法包括：插件化策略架构、事件驱动设计、混合数据库存储方案、容器化部署。
 
 ## Technical Context
 
 **Language/Version**: Python 3.11+ (for trading engine and backtesting) and TypeScript/JavaScript (for web UI)  
 **Primary Dependencies**: FastAPI, pandas, numpy, TA-Lib, Docker, Docker Compose, miniQMT API, PostgreSQL, TimescaleDB  
 **Storage**: Hybrid - PostgreSQL for transactional data (orders, trades, accounts), Time-series DB (TimescaleDB) for market data  
-**Testing**: pytest with comprehensive unit, integration and contract tests  
-**Target Platform**: Linux server (Docker containers), Web UI accessible from multiple platforms  
-**Project Type**: Web application (backend trading engine with web dashboard)  
-**Performance Goals**: Core trading path < 1ms P99 latency, 100ms avg Tick-to-Order, 5min for 1-year backtest, UI < 2s load time  
-**Risk Management**: Implementation includes Walk Forward Analysis to prevent strategy overfitting, with out-of-sample validation for all parameter optimizations  
-**Constraints**: < 1ms P99 latency for trading, 99.99% availability, secure handling of trading keys, real-time processing  
-**Scale/Scope**: Support 20+ concurrent strategies, 1000+ daily active users, multiple exchange connections
+**Testing**: pytest (for Python components), Jest (for TypeScript components)  
+**Target Platform**: Linux server (containerized deployment via Docker)  
+**Project Type**: Web application (backend + frontend)  
+**Performance Goals**: <1ms P99 latency for core trading path, <100ms tick-to-order delay, support for 20+ concurrent strategies  
+**Constraints**: <1ms P99 latency for trading path, 99.99% availability, <10ms for行情接收延迟, <100ms for策略信号生成, <50ms for订单执行  
+**Scale/Scope**: Support for 20+ concurrent strategies, multiple users with role-based access, multiple exchange connections
 
 ## Constitution Check
 
@@ -37,12 +43,14 @@
 **开发工作流与质量门禁**: ✅ 符合 - 计划符合Git Flow和PR审查流程
 
 ### 重新检查结果 (设计后):
-- 策略插件化: 通过Strategy接口和插件系统实现
-- TDD实践: pytest用于单元、集成和契约测试
-- API优先: OpenAPI规范定义在contracts/目录
-- 性能目标: <1ms P99延迟，通过异步架构实现
-- 安全标准: 配置文件中敏感信息安全处理
-- 用户体验: 前后端分离架构支持统一UI体验
+- 策略插件化: 通过Strategy接口和插件系统实现，支持动态加载/卸载
+- TDD实践: pytest用于单元、集成和契约测试，涵盖回测和交易场景
+- API优先: OpenAPI规范定义在contracts/目录，支持前后端分离
+- 性能目标: <1ms P99延迟，通过异步架构和事件驱动模式实现
+- 安全标准: JWT认证、敏感数据加密和审计日志确保安全
+- 用户体验: 前后端分离架构支持统一UI体验和响应式设计
+- 工具一致性: 使用标准化工具链（Docker、FastAPI、TypeScript等）
+- 版本控制: 遵循语义化版本控制，支持策略版本管理
 
 ## Project Structure
 
@@ -63,45 +71,49 @@ specs/[###-feature]/
 ```
 backend/
 ├── src/
-│   ├── models/          # 数据模型定义
-│   ├── services/        # 业务逻辑服务
-│   ├── api/             # API端点定义
-│   ├── strategies/      # 策略插件接口和示例
-│   ├── risk/            # 风险管理模块
-│   ├── market_data/     # 行情数据处理
-│   └── trading/         # 交易执行模块
-└── tests/
-    ├── unit/            # 单元测试
-    ├── integration/     # 集成测试
-    └── contract/        # 合约测试
+│   ├── models/           # 数据模型定义 (from data-model.md)
+│   ├── services/         # 业务逻辑服务
+│   ├── api/              # API端点定义 (from contracts/*.md)
+│   ├── strategies/       # 策略插件系统
+│   ├── indicators/       # 指标计算服务
+│   ├── risk/             # 风控模块
+│   ├── backtest/         # 回测引擎
+│   ├── data/             # 数据管理 (行情、历史数据)
+│   └── core/             # 核心组件 (订单管理、交易执行等)
+├── tests/
+│   ├── unit/             # 单元测试
+│   ├── integration/      # 集成测试
+│   └── contract/         # 契约测试 (from contracts/*.md)
+└── requirements.txt      # Python依赖
 
 frontend/
 ├── src/
-│   ├── components/      # UI组件
-│   ├── pages/           # 页面组件
-│   ├── services/        # API服务
-│   └── utils/           # 工具函数
-└── tests/
-    ├── unit/
-    └── e2e/
+│   ├── components/       # UI组件
+│   ├── pages/            # 页面组件
+│   ├── services/         # API客户端服务
+│   ├── store/            # 状态管理
+│   └── utils/            # 工具函数
+├── tests/
+│   ├── unit/
+│   └── e2e/
+└── package.json          # Node.js依赖
 
-db/
-├── migrations/          # 数据库迁移脚本
-├── init/                # 数据库初始化脚本
-└── schemas/             # 数据库模式定义
+scripts/                  # 部署和运维脚本
+├── deploy.sh             # 一键部署脚本
+├── backup.sh             # 备份脚本
+└── monitor.sh            # 监控脚本
 
 docker/
-├── docker-compose.yml   # 多服务编排
-├── backend.Dockerfile   # 后端服务Dockerfile
-├── frontend.Dockerfile  # 前端服务Dockerfile
-└── monitoring/          # 监控配置
+├── docker-compose.yml    # Docker Compose配置
+├── backend.Dockerfile    # 后端容器镜像配置
+└── frontend.Dockerfile   # 前端容器镜像配置
 
-contracts/               # API契约定义 (OpenAPI/Swagger)
+docs/                     # 文档
+└── api/                  # API文档
 ```
 
-**Structure Decision**: 采用Web应用结构，包含独立的backend和frontend项目，满足功能规范中API优先设计和统一用户体验要求。后端使用Python/FastAPI处理交易逻辑，前端使用React提供用户界面。数据库脚本和Docker配置分别存放，确保部署和监控的独立性。
+**Structure Decision**: 采用前后端分离的架构，后端使用Python/ FastAPI，前端使用TypeScript/现代框架，符合API优先设计原则和项目需求。
 
 ## Complexity Tracking
 
 *Not required as all Constitution Check gates passed.*
-

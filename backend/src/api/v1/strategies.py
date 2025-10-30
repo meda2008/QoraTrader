@@ -1,179 +1,90 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List
 from sqlalchemy.orm import Session
-from src.database import get_db
-from src.models.base import Strategy
-from src.auth.security import get_current_active_user
-from src.schemas.strategy import StrategyCreate, StrategyUpdate, StrategyResponse
+from typing import List
+from ... import models
+from .schemas.strategy import Strategy, StrategyCreate, StrategyUpdate
+from ...database import get_db
+from ...services.strategy_service import StrategyService
 
 router = APIRouter()
 
-@router.get("/", response_model=List[StrategyResponse])
-async def get_strategies(
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
-):
-    """
-    Get all strategies for the current user
-    """
-    strategies = db.query(Strategy).filter(Strategy.user_id == current_user.id).all()
+@router.get("/", response_model=List[Strategy])
+def get_strategies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """获取策略列表"""
+    strategies = db.query(models.Strategy).offset(skip).limit(limit).all()
     return strategies
 
-@router.get("/{strategy_id}", response_model=StrategyResponse)
-async def get_strategy(
-    strategy_id: str,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
-):
-    """
-    Get a specific strategy by ID
-    """
-    strategy = db.query(Strategy).filter(
-        Strategy.id == strategy_id,
-        Strategy.user_id == current_user.id
-    ).first()
-    
-    if not strategy:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Strategy not found"
-        )
-    
-    return strategy
-
-@router.post("/", response_model=StrategyResponse)
-async def create_strategy(
-    strategy_data: StrategyCreate,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
-):
-    """
-    Create a new strategy
-    """
-    # Create new strategy instance
-    strategy = Strategy(
-        name=strategy_data.name,
-        description=strategy_data.description,
-        config=strategy_data.config,
-        code=strategy_data.code,
-        user_id=current_user.id
+@router.post("/", response_model=Strategy)
+def create_strategy(strategy: StrategyCreate, db: Session = Depends(get_db)):
+    """创建新策略"""
+    db_strategy = models.Strategy(
+        name=strategy.name,
+        description=strategy.description,
+        version=strategy.version,
+        config=strategy.config,
+        code_path=strategy.code_path
     )
-    
-    db.add(strategy)
+    db.add(db_strategy)
     db.commit()
-    db.refresh(strategy)
-    
+    db.refresh(db_strategy)
+    return db_strategy
+
+@router.get("/{strategy_id}", response_model=Strategy)
+def get_strategy(strategy_id: str, db: Session = Depends(get_db)):
+    """获取特定策略"""
+    strategy = db.query(models.Strategy).filter(models.Strategy.id == strategy_id).first()
+    if not strategy:
+        raise HTTPException(status_code=404, detail="Strategy not found")
     return strategy
 
-@router.put("/{strategy_id}", response_model=StrategyResponse)
-async def update_strategy(
-    strategy_id: str,
-    strategy_data: StrategyUpdate,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
-):
-    """
-    Update an existing strategy
-    """
-    strategy = db.query(Strategy).filter(
-        Strategy.id == strategy_id,
-        Strategy.user_id == current_user.id
-    ).first()
+@router.put("/{strategy_id}", response_model=Strategy)
+def update_strategy(strategy_id: str, strategy: StrategyUpdate, db: Session = Depends(get_db)):
+    """更新策略"""
+    db_strategy = db.query(models.Strategy).filter(models.Strategy.id == strategy_id).first()
+    if not db_strategy:
+        raise HTTPException(status_code=404, detail="Strategy not found")
     
-    if not strategy:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Strategy not found"
-        )
-    
-    # Update strategy properties
-    if strategy_data.name is not None:
-        strategy.name = strategy_data.name
-    if strategy_data.description is not None:
-        strategy.description = strategy_data.description
-    if strategy_data.config is not None:
-        strategy.config = strategy_data.config
-    if strategy_data.code is not None:
-        strategy.code = strategy_data.code
+    for key, value in strategy.dict(exclude_unset=True).items():
+        setattr(db_strategy, key, value)
     
     db.commit()
-    db.refresh(strategy)
-    
-    return strategy
+    db.refresh(db_strategy)
+    return db_strategy
 
-@router.delete("/{strategy_id}")
-async def delete_strategy(
-    strategy_id: str,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
-):
-    """
-    Delete a strategy
-    """
-    strategy = db.query(Strategy).filter(
-        Strategy.id == strategy_id,
-        Strategy.user_id == current_user.id
-    ).first()
-    
+@router.delete("/{strategy_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_strategy(strategy_id: str, db: Session = Depends(get_db)):
+    """删除策略"""
+    strategy = db.query(models.Strategy).filter(models.Strategy.id == strategy_id).first()
     if not strategy:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Strategy not found"
-        )
+        raise HTTPException(status_code=404, detail="Strategy not found")
     
     db.delete(strategy)
     db.commit()
-    
-    return {"message": "Strategy deleted successfully"}
+    return
 
-@router.post("/{strategy_id}/activate")
-async def activate_strategy(
-    strategy_id: str,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
-):
-    """
-    Activate a strategy
-    """
-    strategy = db.query(Strategy).filter(
-        Strategy.id == strategy_id,
-        Strategy.user_id == current_user.id
-    ).first()
-    
+@router.post("/{strategy_id}/activate", response_model=Strategy)
+def activate_strategy(strategy_id: str, db: Session = Depends(get_db)):
+    """激活策略"""
+    strategy_service = StrategyService(db)
+    strategy = strategy_service.activate_strategy(strategy_id)
     if not strategy:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Strategy not found"
-        )
-    
-    strategy.status = "active"
-    db.commit()
-    db.refresh(strategy)
-    
-    return {"message": "Strategy activated successfully", "strategy": strategy}
+        raise HTTPException(status_code=404, detail="Strategy not found or could not be activated")
+    return strategy
 
-@router.post("/{strategy_id}/deactivate")
-async def deactivate_strategy(
-    strategy_id: str,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
-):
-    """
-    Deactivate a strategy
-    """
-    strategy = db.query(Strategy).filter(
-        Strategy.id == strategy_id,
-        Strategy.user_id == current_user.id
-    ).first()
-    
+@router.post("/{strategy_id}/pause", response_model=Strategy)
+def pause_strategy(strategy_id: str, db: Session = Depends(get_db)):
+    """暂停策略"""
+    strategy_service = StrategyService(db)
+    strategy = strategy_service.pause_strategy(strategy_id)
     if not strategy:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Strategy not found"
-        )
-    
-    strategy.status = "inactive"
-    db.commit()
-    db.refresh(strategy)
-    
-    return {"message": "Strategy deactivated successfully", "strategy": strategy}
+        raise HTTPException(status_code=404, detail="Strategy not found or could not be paused")
+    return strategy
+
+@router.post("/{strategy_id}/stop", response_model=Strategy)
+def stop_strategy(strategy_id: str, db: Session = Depends(get_db)):
+    """停止策略"""
+    strategy_service = StrategyService(db)
+    strategy = strategy_service.stop_strategy(strategy_id)
+    if not strategy:
+        raise HTTPException(status_code=404, detail="Strategy not found or could not be stopped")
+    return strategy

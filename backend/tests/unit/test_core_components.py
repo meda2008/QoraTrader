@@ -4,7 +4,7 @@ These tests verify the correctness of individual components in isolation
 """
 import pytest
 from unittest.mock import patch, MagicMock
-from src.models.base import Order, OrderType, OrderSide, Strategy, Account, Position
+from src.models import Order, OrderType, OrderSide, Strategy, Account, Position
 from src.trading.engine import TradingEngine
 from src.services.backtest_service import BacktestService
 from src.services.risk_rule_service import RiskRuleService

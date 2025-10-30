@@ -1,59 +1,58 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List, Dict, Any
-from src.auth.security import get_current_active_user
-from src.indicators.service import IndicatorService
-from src.schemas.indicator import IndicatorCalculationRequest, IndicatorInfoResponse
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import Dict, Any
+import pandas as pd
+from ..database import get_db
+from ..indicators.service import IndicatorService
 
 router = APIRouter()
+indicator_service = IndicatorService()
 
-@router.get("/list", response_model=List[str])
-async def list_indicators(
-    current_user = Depends(get_current_active_user)
-):
-    """
-    List all available indicators
-    """
-    indicator_service = IndicatorService()
-    return indicator_service.list_indicators()
+@router.get("/available")
+def get_available_indicators():
+    """获取可用的指标列表"""
+    return {"indicators": indicator_service.get_available_indicators()}
 
-@router.post("/calculate")
-async def calculate_indicator(
-    request: IndicatorCalculationRequest,
-    current_user = Depends(get_current_active_user)
+@router.post("/calculate/{indicator_name}")
+def calculate_indicator(
+    indicator_name: str, 
+    data: Dict[str, Any], 
+    params: Dict[str, Any] = None,
+    db: Session = Depends(get_db)
 ):
-    """
-    Calculate an indicator
-    """
-    indicator_service = IndicatorService()
-    
+    """计算技术指标"""
     try:
-        result = indicator_service.calculate(
-            request.indicator_name,
-            request.data,
-            **request.params
-        )
-        return {"result": result}
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
-
-@router.get("/{indicator_name}", response_model=IndicatorInfoResponse)
-async def get_indicator_info(
-    indicator_name: str,
-    current_user = Depends(get_current_active_user)
-):
-    """
-    Get information about a specific indicator
-    """
-    indicator_service = IndicatorService()
+        # 将数据转换为pandas Series
+        if 'values' in data:
+            series_data = pd.Series(data['values'])
+        elif 'close' in data:
+            # 如果提供的是OHLCV数据，则使用收盘价
+            series_data = pd.Series(data['close'])
+        else:
+            raise HTTPException(status_code=400, detail="Invalid data format")
+        
+        # 设置默认参数
+        if params is None:
+            params = {}
+        
+        # 计算指标
+        result = indicator_service.calculate(indicator_name, series_data, **params)
+        
+        # 将结果转换为可序列化的格式
+        if isinstance(result, pd.Series):
+            return {"result": result.tolist()}
+        elif isinstance(result, dict):
+            serializable_result = {}
+            for key, value in result.items():
+                if isinstance(value, pd.Series):
+                    serializable_result[key] = value.tolist()
+                else:
+                    serializable_result[key] = value
+            return {"result": serializable_result}
+        else:
+            return {"result": result}
     
-    try:
-        info = indicator_service.get_indicator_info(indicator_name)
-        return info
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

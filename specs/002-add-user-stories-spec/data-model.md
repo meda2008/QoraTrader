@@ -3,279 +3,156 @@
 ## 核心实体
 
 ### 策略 (Strategy)
-- **属性**:
-  - id: UUID (主键)
-  - name: string (策略名称)
-  - description: string (策略描述)
-  - status: enum (未激活, 已激活, 暂停, 已停止, 异常)
-  - config: JSON (策略配置参数)
-  - code: text (策略代码或引用路径)
-  - created_at: datetime
-  - updated_at: datetime
-  - user_id: UUID (外键，关联用户)
-
-- **验证规则**:
-  - name 必须唯一
-  - status 转换遵循预定义规则
-  - config 必须符合策略接口规范
-
-- **关系**:
-  - 一对多: Strategy → Order (一个策略生成多个订单)
-  - 一对多: Strategy → BacktestReport (一个策略可多次回测)
+- **ID**: 唯一标识符，UUID
+- **名称**: 策略名称，字符串
+- **描述**: 策略描述，字符串
+- **版本**: 语义化版本号，字符串
+- **状态**: 未激活|已激活|暂停|已停止|异常，枚举类型
+- **创建时间**: 创建时间戳
+- **更新时间**: 更新时间戳
+- **配置**: JSON格式的策略配置参数
+- **代码路径**: 策略代码文件路径
+- **性能指标**: JSON格式的绩效指标（收益率、夏普比率等）
+- **回测结果**: 外键关联回测报告
 
 ### 订单 (Order)
-- **属性**:
-  - id: UUID (主键)
-  - strategy_id: UUID (外键，关联策略)
-  - symbol: string (交易标的)
-  - order_type: enum (市价单, 限价单, 止损单等)
-  - side: enum (买入, 卖出)
-  - quantity: decimal (数量)
-  - price: decimal (价格，市价单为0)
-  - status: enum (未提交, 已提交, 部分成交, 完全成交, 已取消, 已成交)
-  - exchange_order_id: string (交易所订单ID)
-  - created_at: datetime
-  - updated_at: datetime
-  - executed_at: datetime (可选，成交时间)
-
-- **验证规则**:
-  - quantity > 0
-  - price >= 0
-  - 状态转换符合业务规则
-
-- **关系**:
-  - 多对一: Order → Strategy (多个订单属于一个策略)
-  - 一对多: Order → Trade (一个订单可产生多个成交记录)
+- **ID**: 唯一标识符，UUID
+- **策略ID**: 关联的策略ID，外键
+- **交易所订单ID**: 交易所返回的订单ID
+- **账户ID**: 关联的账户ID，外键
+- **交易标的**: 交易代码（如股票代码），字符串
+- **订单方向**: 买入|卖出，枚举类型
+- **订单类型**: 市价单|限价单|止损单等，枚举类型
+- **订单状态**: 未提交|已提交|部分成交|完全成交|已取消|已拒绝，枚举类型
+- **订单价格**: 限价单的价格，浮点数
+- **订单数量**: 下单数量，整数
+- **已成交数量**: 已成交的数量，整数
+- **成交均价**: 成交的平均价格，浮点数
+- **提交时间**: 提交时间戳
+- **更新时间**: 更新时间戳
+- **取消时间**: 取消时间戳（如果适用）
 
 ### 成交 (Trade)
-- **属性**:
-  - id: UUID (主键)
-  - order_id: UUID (外键，关联订单)
-  - symbol: string (交易标的)
-  - side: enum (买入, 卖出)
-  - quantity: decimal (成交量)
-  - price: decimal (成交价格)
-  - executed_at: datetime (成交时间)
-  - commission: decimal (手续费)
-
-- **验证规则**:
-  - quantity > 0
-  - price > 0
-  - quantity 不得超过对应订单的未成交量
-
-- **关系**:
-  - 多对一: Trade → Order (多个成交记录对应一个订单)
-
-### 行情数据 (MarketData)
-- **属性**:
-  - id: UUID (主键)
-  - symbol: string (交易标的)
-  - data_type: enum (tick, bar, quote)
-  - timestamp: datetime (时间戳)
-  - open: decimal (开盘价，K线数据)
-  - high: decimal (最高价，K线数据)
-  - low: decimal (最低价，K线数据)
-  - close: decimal (收盘价，K线数据)
-  - volume: decimal (成交量)
-  - turnover: decimal (成交额)
-  - bid_price: decimal (买价，tick数据)
-  - ask_price: decimal (卖价，tick数据)
-  - bid_volume: decimal (买量，tick数据)
-  - ask_volume: decimal (卖量，tick数据)
-
-- **验证规则**:
-  - 所有价格字段 >= 0
-  - 时间戳按时间序列排序
-  - K线数据中的 high >= low, high >= open/close, low <= open/close
-
-- **关系**:
-  - 一对多: MarketData → BacktestReport (行情数据用于回测)
-
-### 持仓 (Position)
-- **属性**:
-  - id: UUID (主键)
-  - account_id: UUID (外键，关联账户)
-  - strategy_id: UUID (外键，关联策略)
-  - symbol: string (交易标的)
-  - direction: enum (多头, 空头)
-  - volume: decimal (持仓量)
-  - available_volume: decimal (可用持仓量)
-  - avg_price: decimal (平均成本价)
-  - unrealized_pnl: decimal (未实现盈亏)
-  - realized_pnl: decimal (已实现盈亏)
-  - created_at: datetime
-  - updated_at: datetime
-
-- **验证规则**:
-  - volume >= 0
-  - available_volume >= 0
-  - available_volume <= volume
-
-- **关系**:
-  - 多对一: Position → Account (多个持仓属于一个账户)
-  - 多对一: Position → Strategy (多个持仓属于一个策略)
+- **ID**: 唯一标识符，UUID
+- **订单ID**: 关联的订单ID，外键
+- **策略ID**: 关联的策略ID，外键
+- **账户ID**: 关联的账户ID，外键
+- **交易标的**: 交易代码，字符串
+- **成交方向**: 买入|卖出，枚举类型
+- **成交价格**: 成交价格，浮点数
+- **成交数量**: 成交数量，整数
+- **成交时间**: 成交时间戳
+- **手续费**: 交易手续费，浮点数
 
 ### 账户 (Account)
-- **属性**:
-  - id: UUID (主键)
-  - user_id: UUID (外键，关联用户)
-  - account_type: enum (模拟, 实盘)
-  - status: enum (正常, 限制, 风控, 冻结)
-  - balance: decimal (账户余额)
-  - available_balance: decimal (可用余额)
-  - market_value: decimal (市值)
-  - total_pnl: decimal (总盈亏)
-  - daily_pnl: decimal (当日盈亏)
-  - risk_level: enum (低, 中, 高, 极高)
-  - created_at: datetime
-  - updated_at: datetime
+- **ID**: 唯一标识符，UUID
+- **账户名称**: 账户名称，字符串
+- **账户编号**: 账户编号，字符串
+- **账户状态**: 正常|限制|风控|冻结，枚举类型
+- **总资金**: 账户总资金，浮点数
+- **可用资金**: 可用资金，浮点数
+- **冻结资金**: 冻结资金，浮点数
+- **累计收益**: 累计收益，浮点数
+- **创建时间**: 创建时间戳
+- **更新时间**: 更新时间戳
 
-- **验证规则**:
-  - balance >= 0
-  - available_balance >= 0
-  - available_balance <= balance
+### 持仓 (Position)
+- **ID**: 唯一标识符，UUID
+- **账户ID**: 关联的账户ID，外键
+- **策略ID**: 关联的策略ID，外键
+- **交易标的**: 交易代码，字符串
+- **持仓方向**: 多头|空头，枚举类型（假设支持做空）
+- **持仓数量**: 持仓数量，整数
+- **可用数量**: 可用数量（可用于交易的数量），整数
+- **持仓成本**: 持仓成本价，浮点数
+- **当前价格**: 最新价格，浮点数
+- **浮动盈亏**: 浮动盈亏，浮点数
+- **盈亏比例**: 盈亏比例，浮点数
+- **创建时间**: 创建时间戳
+- **更新时间**: 更新时间戳
 
-- **关系**:
-  - 一对多: Account → Position (一个账户有多个持仓)
-  - 一对多: Account → Order (一个账户发出多个订单)
+### 行情数据 (MarketData)
+- **ID**: 唯一标识符，UUID
+- **交易标的**: 交易代码，字符串
+- **时间戳**: 数据时间戳
+- **开盘价**: 开盘价，浮点数
+- **收盘价**: 收盘价，浮点数
+- **最高价**: 最高价，浮点数
+- **最低价**: 最低价，浮点数
+- **成交量**: 成交量，整数
+- **成交额**: 成交额，浮点数
+- **五档行情**: JSON格式的五档买卖盘数据
 
 ### 回测报告 (BacktestReport)
-- **属性**:
-  - id: UUID (主键)
-  - strategy_id: UUID (外键，关联策略)
-  - start_date: date (回测开始日期)
-  - end_date: date (回测结束日期)
-  - initial_capital: decimal (初始资金)
-  - final_capital: decimal (最终资金)
-  - total_return: decimal (总收益率)
-  - annual_return: decimal (年化收益率)
-  - sharpe_ratio: decimal (夏普比率)
-  - sortino_ratio: decimal (索提诺比率)
-  - calmar_ratio: decimal (卡玛比率)
-  - max_drawdown: decimal (最大回撤)
-  - win_rate: decimal (胜率)
-  - profit_factor: decimal (盈亏比)
-  - alpha: decimal (阿尔法)
-  - beta: decimal (贝塔)
-  - total_trades: integer (总交易次数)
-  - winning_trades: integer (盈利交易次数)
-  - losing_trades: integer (亏损交易次数)
-  - data: JSON (详细回测数据和图表数据)
-  - created_at: datetime
-
-- **验证规则**:
-  - 所有比率字段应为有效数值
-  - 日期范围有效
-
-- **关系**:
-  - 多对一: BacktestReport → Strategy (多个回测报告属于一个策略)
-
-### 风控参数 (RiskParams)
-- **属性**:
-  - id: UUID (主键)
-  - strategy_id: UUID (外键，关联策略，可为空代表全局)
-  - max_position_size: decimal (最大持仓规模)
-  - max_order_size: decimal (最大订单规模)
-  - max_daily_loss: decimal (最大日亏损)
-  - max_drawdown: decimal (最大回撤限制)
-  - position_limit_per_symbol: decimal (单标的持仓限制)
-  - daily_order_limit: integer (日订单数量限制)
-  - order_frequency_limit: integer (订单频率限制，单位秒)
-  - risk_level: enum (低, 中, 高)
-  - is_active: boolean (是否激活)
-
-- **验证规则**:
-  - 所有限制参数 >= 0
-  - risk_level 符合预定义枚举
-
-- **关系**:
-  - 多对一: RiskParams → Strategy (风控参数属于策略)
-
-### 指标库 (IndicatorLibrary)
-- **属性**:
-  - id: UUID (主键)
-  - name: string (指标库名称)
-  - description: string (指标库描述)
-  - version: string (版本号)
-  - path: string (库文件路径)
-  - is_active: boolean (是否激活)
-  - created_at: datetime
-  - updated_at: datetime
-
-- **验证规则**:
-  - name 在系统中唯一
-  - path 有效且可达
-
-- **关系**:
-  - 一对多: IndicatorLibrary → Strategy (一个指标库可被多个策略使用)
+- **ID**: 唯一标识符，UUID
+- **策略ID**: 关联的策略ID，外键
+- **回测名称**: 回测任务名称，字符串
+- **回测开始时间**: 回测开始时间戳
+- **回测结束时间**: 回测结束时间戳
+- **初始资金**: 回测初始资金，浮点数
+- **最终资金**: 回测最终资金，浮点数
+- **总收益率**: 总收益率，浮点数
+- **年化收益率**: 年化收益率，浮点数
+- **夏普比率**: 夏普比率，浮点数
+- **最大回撤**: 最大回撤，浮点数
+- **胜率**: 交易胜率，浮点数
+- **盈亏比**: 平均盈亏比，浮点数
+- **最大连续盈利次数**: 最大连续盈利次数，整数
+- **最大连续亏损次数**: 最大连续亏损次数，整数
+- **交易次数**: 总交易次数，整数
+- **参数配置**: JSON格式的回测参数配置
+- **详细交易记录**: JSON格式的详细交易记录
+- **生成时间**: 报告生成时间戳
 
 ### 用户 (User)
-- **属性**:
-  - id: UUID (主键)
-  - username: string (用户名)
-  - email: string (邮箱)
-  - role: enum (管理员, 策略师, 交易员)
-  - password_hash: string (密码哈希)
-  - is_active: boolean (是否激活)
-  - created_at: datetime
-  - updated_at: datetime
+- **ID**: 唯一标识符，UUID
+- **用户名**: 登录用户名，字符串
+- **邮箱**: 用户邮箱，字符串
+- **角色**: 管理员|策略师|交易员，枚举类型
+- **状态**: 激活|禁用，枚举类型
+- **创建时间**: 创建时间戳
+- **更新时间**: 更新时间戳
 
-- **验证规则**:
-  - username 唯一
-  - email 格式有效
-  - role 符合预定义枚举
+### 风控参数 (RiskParams)
+- **ID**: 唯一标识符，UUID
+- **策略ID**: 关联的策略ID，外键
+- **账户级风控**: JSON格式的账户级风控参数
+- **个股级风控**: JSON格式的个股级风控参数
+- **全局风控**: JSON格式的全局风控参数
+- **创建时间**: 创建时间戳
+- **更新时间**: 更新时间戳
 
-- **关系**:
-  - 一对多: User → Strategy (一个用户可创建多个策略)
-  - 一对多: User → Account (一个用户可管理多个账户)
+### 指标库 (IndicatorLibrary)
+- **ID**: 唯一标识符，UUID
+- **名称**: 指标库名称，字符串
+- **版本**: 版本号，字符串
+- **类型**: 内置|外部，枚举类型
+- **状态**: 激活|停用，枚举类型
+- **描述**: 指标库描述，字符串
+- **路径**: 指标库文件路径，字符串
+- **支持指标列表**: JSON格式的支持指标列表
+- **创建时间**: 创建时间戳
+- **更新时间**: 更新时间戳
 
-### 参数优化任务 (ParameterOptimization)
-- **属性**:
-  - id: UUID (主键)
-  - strategy_id: UUID (外键，关联策略)
-  - optimization_type: enum (网格搜索, 贝叶斯优化, 遗传算法, 强化学习)
-  - parameters_space: JSON (参数搜索空间定义)
-  - status: enum (待处理, 处理中, 已完成, 已取消, 失败)
-  - best_params: JSON (最佳参数组合)
-  - best_result: JSON (最佳结果指标)
-  - all_results: JSON (所有尝试结果)
-  - created_at: datetime
-  - updated_at: datetime
+## 关系
 
-- **验证规则**:
-  - parameters_space 必须符合规范格式
-  - status 转换遵循预定义规则
+1. 一个账户可以有多个订单 (Account → Order)
+2. 一个策略可以有多个订单 (Strategy → Order)
+3. 一个订单可以有多个成交 (Order → Trade)
+4. 一个账户可以有多个持仓 (Account → Position)
+5. 一个策略可以有多个持仓 (Strategy → Position)
+6. 一个策略可以生成多个回测报告 (Strategy → BacktestReport)
+7. 一个用户可以管理多个账户 (User → Account)
+8. 一个策略有一个风控参数配置 (Strategy → RiskParams)
+9. 一个策略可以使用多个指标库 (Strategy → IndicatorLibrary)
 
-- **关系**:
-  - 多对一: ParameterOptimization → Strategy (参数优化任务属于特定策略)
-
-## 状态转换规则
-
-### 订单状态转换
-```
-未提交 → 已提交 → 部分成交 → 完全成交
-     ↓         ↓         ↓         ↓
-   已取消 ← 已提交 ← 部分成交 ← 完全成交
-```
+## 状态转换
 
 ### 策略状态转换
-```
-未激活 → 已激活 → 暂停 → 已停止
-   ↑        ↓              ↑
-   └---- 已停止 ←------------┘
-   ↓
-异常 (错误状态，需人工干预)
-```
+未激活 → 已激活 → 暂停 → 已停止 → 异常 → 已停止 → 已激活
+
+### 订单状态转换
+未提交 → 已提交 → 部分成交/已取消 → 已成交
 
 ### 账户状态转换
-```
-正常 → 限制 → 风控 → 冻结
-  ↑     ↑     ↑     ↑
-  └-----┴-----┴-----┘
-```
-
-### 回测报告状态
-- 生成中 → 已完成/失败
-
-### 参数优化任务状态
-- 待处理 → 处理中 → 已完成/已取消/失败
+正常 → 限制 → 风控 → 冻结 → 正常
