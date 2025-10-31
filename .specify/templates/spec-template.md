@@ -130,4 +130,19 @@
 - **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%]
+
+## Constitution Alignment *(mandatory)*
+
+<!--
+  ACTION REQUIRED: Confirm how this specification aligns with project constitution principles
+-->
+
+### Core Principles Compliance
+
+- **代码质量与可维护性原则**: [How the design ensures high code quality and maintainability]
+- **全面测试与质量保障原则**: [How testing will be implemented to meet 90%+ coverage requirements]
+- **工具一致性与API优先设计原则**: [How tools and API design align with project standards]
+- **语义化版本控制与策略管理原则**: [How versioning will be handled]
+- **用户体验一致性与性能优化原则**: [How performance benchmarks will be met and UX consistency maintained]
+- **安全与运维标准**: [How security and operational requirements are addressed]

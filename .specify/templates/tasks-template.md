@@ -48,7 +48,7 @@ description: "Task list template for feature implementation"
 - [ ] T001 Create project structure per implementation plan in QoraTrader/
 - [ ] T002 Initialize [language] project with [framework] dependencies in backend/
 - [ ] T003 [P] Initialize [language]/[framework] project with dependencies in frontend/
-- [ ] T004 [P] Configure linting and formatting tools in both backend and frontend
+- [ ] T004 [P] Configure linting and formatting tools in both backend and frontend (代码质量与可维护性原则)
 - [ ] T005 Create Docker and Docker Compose configuration files in docker/
 - [ ] T006 Initialize database schemas and migrations framework in db/
 
@@ -72,6 +72,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T014 Create base strategy interface in backend/src/strategies/
 - [ ] T015 [P] Implement event bus/messaging system in backend/src/events/
 - [ ] T016 Setup indicator service interface in backend/src/indicators/
+- [ ] T017 Configure comprehensive testing framework with 90%+ coverage requirement (全面测试与质量保障原则)
+- [ ] T018 Setup performance monitoring and benchmarking tools to meet <5ms latency requirements (用户体验一致性与性能优化原则)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
